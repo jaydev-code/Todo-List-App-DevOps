@@ -1,6 +1,7 @@
 [build]
-  publish = "dist"
-  command = "npm run build"
+  base    = "app-artifact"     # path to your folder containing index.html
+  publish = "app-artifact"     # publish the same folder
+  command = ""                 # no build step needed since it's plain HTML/JS/CSS
 
 [[headers]]
   for = "/*"
