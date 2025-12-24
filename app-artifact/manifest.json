@@ -1,0 +1,32 @@
+{
+  "short_name": "DevOpsPWA",
+  "name": "DevOps Task Management PWA",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/72/4A90E2/FFFFFF?text=72",
+      "type": "image/png",
+      "sizes": "72x72"
+    },
+    {
+      "src": "https://via.placeholder.com/96/4A90E2/FFFFFF?text=96",
+      "type": "image/png",
+      "sizes": "96x96"
+    },
+    {
+      "src": "https://via.placeholder.com/192/4A90E2/FFFFFF?text=192",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://via.placeholder.com/512/4A90E2/FFFFFF?text=512",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/index.html",
+  "background_color": "#f4f7f6",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#4A90E2",
+  "description": "DevOps focused progressive web application for task management."
+}

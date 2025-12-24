@@ -1,0 +1,32 @@
+name: Build Android (TWA)
+
+on:
+  workflow_dispatch: # Manual trigger for heavy builds
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Bubblewrap CLI
+        run: npm install -g @bubblewrap/cli
+
+      - name: Build Android Asset (AAB/APK)
+        run: |
+          echo "Using twa-config.json to generate Android Project"
+          # In a real environment, you'd run:
+          # bubblewrap build --config infrastructure/android/twa-config.json
+          echo "Android build simulation complete."
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-release
+          path: ./*.aab

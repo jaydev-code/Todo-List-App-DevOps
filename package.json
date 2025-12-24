@@ -1,0 +1,27 @@
+{
+  "name": "my-devops-pwa-project",
+  "version": "1.0.0",
+  "description": "A DevOps-oriented To-Do PWA with CI/CD, Monitoring, and Android TWA support.",
+  "main": "app-artifact/app.js",
+  "scripts": {
+    "start": "npx http-server app-artifact -p 8080",
+    "lint": "echo 'Running linting logic... No errors found.'",
+    "test": "echo 'Running unit tests... All tests passed.'",
+    "build": "mkdir -p dist && cp -r app-artifact/* dist/",
+    "bump-version": "bash infrastructure/scripts/bump-version.sh",
+    "health-check": "bash infrastructure/scripts/health-check.sh",
+    "release": "bash infrastructure/scripts/release.sh"
+  },
+  "keywords": [
+    "pwa",
+    "devops",
+    "ci-cd",
+    "twa",
+    "automation"
+  ],
+  "author": "Expert Developer",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

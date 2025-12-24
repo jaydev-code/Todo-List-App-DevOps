@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4A90E2">
+    <meta name="description" content="A production-ready DevOps PWA project">
+    <title>DevOps To-Do PWA</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/192/4A90E2/FFFFFF?text=PWA">
+</head>
+<body>
+    <header>
+        <h1>DevOps Tasks</h1>
+        <span id="offline-badge" class="badge hidden">Offline Mode</span>
+    </header>
+
+    <main id="app">
+        <section class="input-group">
+            <input type="text" id="todo-input" placeholder="Enter a new task..." aria-label="New task">
+            <button id="add-btn">Add Task</button>
+        </section>
+
+        <ul id="todo-list">
+            <!-- Tasks will be injected here -->
+        </ul>
+    </main>
+
+    <footer>
+        <p>Environment: <span id="env-tag">Production</span> | Version: <span id="version-tag">1.0.0</span></p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('SW Registered'))
+                    .catch(err => console.log('SW Registration Failed', err));
+            });
+        }
+    </script>
+</body>
+</html>

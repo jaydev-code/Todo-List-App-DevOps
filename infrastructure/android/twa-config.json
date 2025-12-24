@@ -1,0 +1,16 @@
+{
+  "packageId": "com.devops.pwa.todo",
+  "host": "your-app-domain.netlify.app",
+  "name": "DevOps PWA",
+  "launcherName": "DevOpsTasks",
+  "display": "standalone",
+  "themeColor": "#4A90E2",
+  "navigationColor": "#4A90E2",
+  "backgroundColor": "#f4f7f6",
+  "enableNotifications": true,
+  "shortcuts": [],
+  "webManifestUrl": "https://your-app-domain.netlify.app/manifest.json",
+  "appVersionCode": 1,
+  "appVersionName": "1.0.0",
+  "generatorApp": "bubblewrap-cli"
+}
