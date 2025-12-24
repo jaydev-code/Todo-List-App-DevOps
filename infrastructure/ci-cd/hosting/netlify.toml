@@ -1,20 +1,16 @@
-# Netlify configuration for Todo PWA DevOps
-
 [build]
-  base    = "app-artifact"       # folder where index.html is located
-  publish = "app-artifact"       # folder to publish
-  command = ""                   # no build command needed
+  base = "/"                # root of the repo
+  publish = "app-artifact"  # folder with index.html
+  command = ""              # no build step needed for vanilla HTML/JS
 
-# Security headers
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
 [[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"
     X-XSS-Protection = "1; mode=block"
     Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://via.placeholder.com; font-src https://fonts.gstatic.com;"
-
-# Redirects for SPA (PWA) support
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
