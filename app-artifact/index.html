@@ -3,42 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#4A90E2">
-    <meta name="description" content="A production-ready DevOps PWA project">
-    <title>DevOps To-Do PWA</title>
+    <meta name="theme-color" content="#2563eb">
+    <meta name="description" content="Enterprise DevOps Task Management Dashboard">
+    <title>DevOps Dashboard | Task Manager</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="https://via.placeholder.com/192/4A90E2/FFFFFF?text=PWA">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <header>
-        <h1>DevOps Tasks</h1>
-        <span id="offline-badge" class="badge hidden">Offline Mode</span>
-    </header>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-cloud-arrow-up"></i>
+                <span>DevOps<span class="brand-highlight">Dashboard</span></span>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-icon" id="theme-toggle" aria-label="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="status-indicator" id="status-indicator">
+                    <span class="status-dot online"></span>
+                    <span class="status-text">Online</span>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-    <main id="app">
-        <section class="input-group">
-            <input type="text" id="todo-input" placeholder="Enter a new task..." aria-label="New task">
-            <button id="add-btn">Add Task</button>
-        </section>
+    <!-- Main Dashboard -->
+    <main class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">
+                    <i class="fas fa-sliders-h"></i>
+                    Environments
+                </h3>
+                <div class="env-badges">
+                    <span class="env-badge prod active">Production</span>
+                    <span class="env-badge staging">Staging</span>
+                    <span class="env-badge dev">Development</span>
+                </div>
+            </div>
 
-        <ul id="todo-list">
-            <!-- Tasks will be injected here -->
-        </ul>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">
+                    <i class="fas fa-chart-line"></i>
+                    Analytics
+                </h3>
+                <div class="stats-card">
+                    <div class="stat-item">
+                        <span class="stat-label">Uptime</span>
+                        <span class="stat-value">99.9%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Tasks Done</span>
+                        <span class="stat-value" id="tasks-done">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Deployments</span>
+                        <span class="stat-value" id="deployment-count">12</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">
+                    <i class="fas fa-bolt"></i>
+                    Quick Actions
+                </h3>
+                <button class="btn-secondary" id="quick-deploy">
+                    <i class="fas fa-rocket"></i>
+                    Deploy Staging
+                </button>
+                <button class="btn-secondary" id="run-tests">
+                    <i class="fas fa-vial"></i>
+                    Run Tests
+                </button>
+                <button class="btn-secondary" id="backup-now">
+                    <i class="fas fa-database"></i>
+                    Backup Data
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Task Management Section -->
+            <section class="card task-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-tasks"></i> DevOps Tasks</h2>
+                    <div class="card-actions">
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" data-filter="all">All</button>
+                            <button class="filter-btn" data-filter="pending">Pending</button>
+                            <button class="filter-btn" data-filter="completed">Completed</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task Input -->
+                <div class="task-input-group">
+                    <div class="input-with-icon">
+                        <i class="fas fa-plus"></i>
+                        <input type="text" 
+                               id="todo-input" 
+                               placeholder="Add a new DevOps task (e.g., 'Deploy v2.1.0 to production')"
+                               aria-label="New task">
+                    </div>
+                    <select id="priority-select" class="priority-select">
+                        <option value="normal">Normal Priority</option>
+                        <option value="high">High Priority</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                    <button id="add-btn" class="btn-primary">
+                        <i class="fas fa-plus-circle"></i>
+                        Add Task
+                    </button>
+                </div>
+
+                <!-- Task List -->
+                <div class="task-list-container">
+                    <ul id="todo-list" class="task-list">
+                        <!-- Tasks will be injected here -->
+                    </ul>
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="empty-state">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>No pending tasks</h3>
+                    <p>All DevOps tasks are completed and deployed successfully.</p>
+                </div>
+            </section>
+
+            <!-- Activity Feed -->
+            <section class="card activity-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-history"></i> Recent Activity</h2>
+                </div>
+                <div class="activity-feed" id="activity-feed">
+                    <div class="activity-item">
+                        <div class="activity-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p>Production deployment completed successfully</p>
+                            <span class="activity-time">2 minutes ago</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p>Security scan detected 2 vulnerabilities</p>
+                            <span class="activity-time">15 minutes ago</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon info">
+                            <i class="fas fa-code-branch"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p>New pull request merged to main branch</p>
+                            <span class="activity-time">1 hour ago</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
     </main>
 
-    <footer>
-        <p>Environment: <span id="env-tag">Production</span> | Version: <span id="version-tag">1.0.0</span></p>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <span class="footer-label">
+                    <i class="fas fa-code-branch"></i>
+                    Environment:
+                </span>
+                <span class="env-badge prod small">Production</span>
+                <span class="footer-separator">|</span>
+                <span class="footer-label">
+                    <i class="fas fa-tag"></i>
+                    Version:
+                </span>
+                <span id="version-tag" class="version">v2.1.0</span>
+                <span class="footer-separator">|</span>
+                <span class="footer-label">
+                    <i class="fas fa-shield-alt"></i>
+                    Status:
+                </span>
+                <span id="system-status" class="status-text online">All Systems Operational</span>
+            </div>
+            <div class="footer-meta">
+                <span id="last-sync">
+                    <i class="fas fa-sync"></i>
+                    Last synced: Just now
+                </span>
+                <span id="offline-badge" class="badge offline hidden">
+                    <i class="fas fa-wifi-slash"></i>
+                    Offline Mode
+                </span>
+            </div>
+        </div>
     </footer>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
 
     <script src="app.js"></script>
     <script>
+        // Service Worker Registration
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js')
-                    .then(reg => console.log('SW Registered'))
-                    .catch(err => console.log('SW Registration Failed', err));
-            });
+            navigator.serviceWorker.register('service-worker.js')
+                .then(reg => console.log('Service Worker registered:', reg))
+                .catch(err => console.log('Service Worker registration failed:', err));
         }
     </script>
 </body>
