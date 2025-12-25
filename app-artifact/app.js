@@ -1,10 +1,29 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize state
+    // FIX: Handle localStorage for online/offline
+    const isLocalhost = window.location.hostname === 'localhost' || 
+                        window.location.hostname === '127.0.0.1';
+    
+    // FIX: Try-catch for localStorage errors
+    let storedTasks = [];
+    try {
+        storedTasks = JSON.parse(localStorage.getItem('devops-tasks')) || [];
+    } catch (e) {
+        console.log('LocalStorage error, using empty tasks');
+        storedTasks = [];
+    }
+
     const state = {
-        tasks: JSON.parse(localStorage.getItem('devops-tasks')) || [],
+        tasks: storedTasks,
         filter: 'all',
-        theme: localStorage.getItem('theme') || 'light'
+        theme: 'light' // Default theme
     };
+
+    // Try to get saved theme
+    try {
+        state.theme = localStorage.getItem('devops-theme') || 'light';
+    } catch (e) {
+        // If localStorage fails, use default
+    }
 
     // DOM Elements
     const elements = {
@@ -30,7 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initApp();
 
     function initApp() {
-        // Set theme
+        console.log('Initializing app...');
+        
+        // Set theme immediately
         document.documentElement.setAttribute('data-theme', state.theme);
         updateThemeIcon();
         
@@ -45,42 +66,55 @@ document.addEventListener('DOMContentLoaded', () => {
         // Check online status
         updateConnectionStatus();
         
-        // Load sample activity
+        // Load sample activity (NOW ONLY IN JAVASCRIPT)
         loadSampleActivity();
     }
 
     function setupEventListeners() {
         // Task management
-        elements.addBtn.addEventListener('click', addTask);
-        elements.todoInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') addTask();
-        });
+        if (elements.addBtn) {
+            elements.addBtn.addEventListener('click', addTask);
+        }
+        
+        if (elements.todoInput) {
+            elements.todoInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addTask();
+            });
+        }
 
         // Filter tasks
-        elements.filterButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                elements.filterButtons.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                state.filter = btn.dataset.filter;
-                renderTasks();
+        if (elements.filterButtons) {
+            elements.filterButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    elements.filterButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    state.filter = btn.dataset.filter;
+                    renderTasks();
+                });
             });
-        });
+        }
 
         // Theme toggle
-        elements.themeToggle.addEventListener('click', toggleTheme);
+        if (elements.themeToggle) {
+            elements.themeToggle.addEventListener('click', toggleTheme);
+        }
 
         // Quick actions
-        document.getElementById('quick-deploy')?.addEventListener('click', () => {
+        const quickDeploy = document.getElementById('quick-deploy');
+        const runTests = document.getElementById('run-tests');
+        const backupNow = document.getElementById('backup-now');
+        
+        if (quickDeploy) quickDeploy.addEventListener('click', () => {
             showToast('Deployment Started', 'Staging deployment has been initiated.', 'info');
             logActivity('Staging deployment initiated');
         });
-
-        document.getElementById('run-tests')?.addEventListener('click', () => {
+        
+        if (runTests) runTests.addEventListener('click', () => {
             showToast('Tests Running', 'Test suite execution started.', 'info');
             logActivity('Test suite execution started');
         });
-
-        document.getElementById('backup-now')?.addEventListener('click', () => {
+        
+        if (backupNow) backupNow.addEventListener('click', () => {
             showToast('Backup Started', 'System backup initiated.', 'info');
             logActivity('System backup initiated');
         });
@@ -92,12 +126,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Task Management
     function addTask() {
-        const text = elements.todoInput.value.trim();
-        const priority = elements.prioritySelect.value;
+        const text = elements.todoInput?.value.trim();
+        const priority = elements.prioritySelect?.value || 'normal';
         
         if (!text) {
             showToast('Empty Task', 'Please enter a task description.', 'error');
-            elements.todoInput.focus();
+            elements.todoInput?.focus();
             return;
         }
 
@@ -113,8 +147,10 @@ document.addEventListener('DOMContentLoaded', () => {
         saveTasks();
         renderTasks();
         
-        elements.todoInput.value = '';
-        elements.todoInput.focus();
+        if (elements.todoInput) {
+            elements.todoInput.value = '';
+            elements.todoInput.focus();
+        }
         
         showToast('Task Added', 'New DevOps task has been added.', 'success');
         logActivity(`Task added: "${text}"`);
@@ -147,12 +183,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function saveTasks() {
-        localStorage.setItem('devops-tasks', JSON.stringify(state.tasks));
+        try {
+            localStorage.setItem('devops-tasks', JSON.stringify(state.tasks));
+        } catch (e) {
+            console.log('Failed to save tasks to localStorage');
+        }
         updateStats();
         updateSyncTime();
     }
 
     function renderTasks() {
+        if (!elements.todoList || !elements.emptyState) return;
+        
         const filteredTasks = state.tasks.filter(task => {
             if (state.filter === 'pending') return !task.completed;
             if (state.filter === 'completed') return task.completed;
@@ -171,6 +213,10 @@ document.addEventListener('DOMContentLoaded', () => {
         filteredTasks.forEach(task => {
             const li = document.createElement('li');
             li.className = 'task-item';
+            
+            // FIX: Ensure priority is always defined
+            const priority = task.priority || 'normal';
+            
             li.innerHTML = `
                 <div class="task-checkbox ${task.completed ? 'checked' : ''}" onclick="app.toggleTask(${task.id})">
                     ${task.completed ? '<i class="fas fa-check"></i>' : ''}
@@ -178,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="task-content">
                     <div class="task-text ${task.completed ? 'completed' : ''}">${escapeHtml(task.text)}</div>
                     <div class="task-meta">
-                        <span class="task-priority ${task.priority}">${task.priority.toUpperCase()}</span>
+                        <span class="task-priority ${priority}">${priority.toUpperCase()}</span>
                         <span>${formatDate(task.createdAt)}</span>
                     </div>
                 </div>
@@ -196,31 +242,51 @@ document.addEventListener('DOMContentLoaded', () => {
     function toggleTheme() {
         state.theme = state.theme === 'light' ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', state.theme);
-        localStorage.setItem('theme', state.theme);
+        
+        try {
+            localStorage.setItem('devops-theme', state.theme);
+        } catch (e) {
+            // If localStorage fails, continue without saving
+            console.log('Failed to save theme preference');
+        }
+        
         updateThemeIcon();
     }
 
     function updateThemeIcon() {
+        if (!elements.themeToggle) return;
         const icon = elements.themeToggle.querySelector('i');
-        icon.className = state.theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+        if (icon) {
+            icon.className = state.theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+        }
     }
 
     // Status Management
     function updateConnectionStatus() {
         const isOnline = navigator.onLine;
         
-        if (isOnline) {
-            elements.offlineBadge.classList.add('hidden');
-            elements.statusDot.className = 'status-dot online';
-            elements.statusText.textContent = 'Online';
-            elements.systemStatus.textContent = 'All Systems Operational';
-            elements.systemStatus.className = 'status-text online';
-        } else {
-            elements.offlineBadge.classList.remove('hidden');
-            elements.statusDot.className = 'status-dot offline';
-            elements.statusText.textContent = 'Offline';
-            elements.systemStatus.textContent = 'Limited Connectivity';
-            elements.systemStatus.className = 'status-text offline';
+        if (elements.offlineBadge) {
+            if (isOnline) {
+                elements.offlineBadge.classList.add('hidden');
+            } else {
+                elements.offlineBadge.classList.remove('hidden');
+            }
+        }
+        
+        if (elements.statusDot) {
+            elements.statusDot.className = isOnline ? 'status-dot online' : 'status-dot offline';
+        }
+        
+        if (elements.statusText) {
+            elements.statusText.textContent = isOnline ? 'Online' : 'Offline';
+        }
+        
+        if (elements.systemStatus) {
+            elements.systemStatus.textContent = isOnline ? 'All Systems Operational' : 'Limited Connectivity';
+            elements.systemStatus.className = isOnline ? 'status-text online' : 'status-text offline';
+        }
+        
+        if (!isOnline) {
             showToast('Offline Mode', 'Working with cached data.', 'info');
         }
     }
@@ -228,30 +294,63 @@ document.addEventListener('DOMContentLoaded', () => {
     // Stats and Analytics
     function updateStats() {
         const completedTasks = state.tasks.filter(t => t.completed).length;
-        elements.tasksDone.textContent = completedTasks;
         
-        // Simulate deployment count (in real app, this would come from API)
-        const deploymentCount = Math.floor(Math.random() * 5) + 10;
-        elements.deploymentCount.textContent = deploymentCount;
+        if (elements.tasksDone) {
+            elements.tasksDone.textContent = completedTasks;
+        }
+        
+        if (elements.deploymentCount) {
+            // Consistent deployment count for online/offline
+            const deploymentCount = 12; // Fixed number for consistency
+            elements.deploymentCount.textContent = deploymentCount;
+        }
     }
 
     function updateSyncTime() {
+        if (!elements.lastSync) return;
         const now = new Date();
         const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         elements.lastSync.innerHTML = `<i class="fas fa-sync"></i> Last synced: ${timeString}`;
     }
 
-    // Activity Log
+    // Activity Log - NOW ONLY IN JAVASCRIPT
     function loadSampleActivity() {
+        if (!elements.activityFeed) return;
+        
+        // Clear any existing activities (including hardcoded ones)
+        elements.activityFeed.innerHTML = '';
+        
+        // Consistent sample data for online/offline
         const sampleActivities = [
-            { type: 'success', message: 'Production deployment completed successfully', time: '2 minutes ago' },
-            { type: 'warning', message: 'Security scan detected 2 vulnerabilities', time: '15 minutes ago' },
-            { type: 'info', message: 'New pull request merged to main branch', time: '1 hour ago' },
-            { type: 'success', message: 'All automated tests passed', time: '2 hours ago' },
-            { type: 'info', message: 'Database backup completed', time: '4 hours ago' }
+            { 
+                type: 'success', 
+                message: 'Production deployment v2.1.0 completed successfully', 
+                time: 'Just now'
+            },
+            { 
+                type: 'warning', 
+                message: 'Security scan detected 2 low severity vulnerabilities', 
+                time: '15 minutes ago' 
+            },
+            { 
+                type: 'info', 
+                message: 'New pull request #42 merged to main branch', 
+                time: '1 hour ago' 
+            },
+            { 
+                type: 'success', 
+                message: 'All CI/CD pipeline tests passed', 
+                time: '2 hours ago' 
+            },
+            { 
+                type: 'info', 
+                message: 'Daily database backup completed', 
+                time: '4 hours ago' 
+            }
         ];
 
-        sampleActivities.forEach(activity => {
+        // Add activities in reverse order (newest first)
+        sampleActivities.reverse().forEach(activity => {
             addActivityItem(activity.type, activity.message, activity.time);
         });
     }
@@ -263,6 +362,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function addActivityItem(type, message, time) {
+        if (!elements.activityFeed) return;
+        
         const activityItem = document.createElement('div');
         activityItem.className = 'activity-item';
         
@@ -293,6 +394,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Toast Notifications
     function showToast(title, message, type = 'info') {
         const container = document.getElementById('toast-container');
+        if (!container) return;
+        
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         
@@ -322,17 +425,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Utility Functions
     function escapeHtml(text) {
+        if (!text) return '';
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
 
     function formatDate(isoString) {
-        const date = new Date(isoString);
-        return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        if (!isoString) return 'Just now';
+        try {
+            const date = new Date(isoString);
+            return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        } catch (e) {
+            return 'Just now';
+        }
     }
 
-    // Expose functions to global scope for onclick handlers
+    // Expose functions to global scope
     window.app = {
         toggleTask: toggleTaskCompletion,
         deleteTask: deleteTask,

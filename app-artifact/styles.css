@@ -895,3 +895,23 @@ body {
 .hidden {
     display: none !important;
 }
+
+html:not([data-theme="dark"]) {
+    --bg-primary: #ffffff !important;
+    --text-primary: #111827 !important;
+}
+
+html[data-theme="dark"] {
+    --bg-primary: #111827 !important;
+    --text-primary: #f9fafb !important;
+}
+
+/* Ensure body always has proper colors */
+body {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    transition: background-color 0.3s ease, color 0.3s ease !important;
+}
+
+/* Cache busting for online deployment */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
