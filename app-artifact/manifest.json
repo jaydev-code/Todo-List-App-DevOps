@@ -5,23 +5,106 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "display_override": ["window-controls-overlay"],
-  "orientation": "portrait",
+  "display_override": ["window-controls-overlay", "minimal-ui"],
+  "orientation": "any",
   "background_color": "#0f172a",
   "theme_color": "#2563eb",
-  "categories": ["productivity", "business", "utilities"],
+  "categories": ["productivity", "business", "utilities", "developer"],
   "lang": "en-US",
   "dir": "ltr",
   "id": "/",
+  
+  "icons": [
+    {
+      "src": "icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  
+  "screenshots": [
+    {
+      "src": "screenshots/mobile-light.png",
+      "sizes": "375x812",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile Light Mode Interface"
+    },
+    {
+      "src": "screenshots/mobile-dark.png",
+      "sizes": "375x812",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile Dark Mode Interface"
+    },
+    {
+      "src": "screenshots/tablet.png",
+      "sizes": "768x1024",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Tablet View with Sidebar"
+    },
+    {
+      "src": "screenshots/desktop.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Desktop Dashboard View"
+    }
+  ],
+  
   "shortcuts": [
     {
       "name": "Add New Task",
-      "short_name": "Add Task",
+      "short_name": "New Task",
       "description": "Quickly add a new DevOps task",
-      "url": "/?action=add-task",
+      "url": "/?source=shortcut&action=new-task",
       "icons": [
         {
-          "src": "/icons/shortcut-add-task-96.png",
+          "src": "icons/shortcut-add-96.png",
           "sizes": "96x96",
           "type": "image/png"
         }
@@ -31,10 +114,10 @@
       "name": "View Active Tasks",
       "short_name": "Active",
       "description": "View all active DevOps tasks",
-      "url": "/?filter=pending",
+      "url": "/?source=shortcut&filter=active",
       "icons": [
         {
-          "src": "/icons/shortcut-active-96.png",
+          "src": "icons/shortcut-active-96.png",
           "sizes": "96x96",
           "type": "image/png"
         }
@@ -44,170 +127,76 @@
       "name": "Quick Deploy",
       "short_name": "Deploy",
       "description": "Start a quick deployment",
-      "url": "/?action=quick-deploy",
+      "url": "/?source=shortcut&action=deploy",
       "icons": [
         {
-          "src": "/icons/shortcut-deploy-96.png",
+          "src": "icons/shortcut-deploy-96.png",
           "sizes": "96x96",
           "type": "image/png"
         }
       ]
     }
   ],
-  "icons": [
-    {
-      "src": "/icons/icon-72x72.png",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/icon-96x96.png",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/icon-128x128.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/icon-144x144.png",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/icon-152x152.png",
-      "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/icon-384x384.png",
-      "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/maskable-icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "/icons/maskable-icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/screenshots/desktop-light.png",
-      "sizes": "1920x1080",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "DevOps Dashboard Desktop View"
-    },
-    {
-      "src": "/screenshots/mobile-dark.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "DevOps Dashboard Mobile Dark Mode"
-    },
-    {
-      "src": "/screenshots/tablet-tasks.png",
-      "sizes": "1536x2048",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Task Management on Tablet"
-    }
-  ],
-  "related_applications": [
-    {
-      "platform": "play",
-      "url": "https://play.google.com/store/apps/details?id=com.devops.dashboard.twa",
-      "id": "com.devops.dashboard.twa"
-    },
-    {
-      "platform": "webapp",
-      "url": "https://devops-dashboard.example.com/manifest.json"
-    }
-  ],
-  "prefer_related_applications": false,
-  "protocol_handlers": [
-    {
-      "protocol": "web+devops",
-      "url": "/?action=%s"
-    }
-  ],
+  
   "share_target": {
     "action": "/?share",
     "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
     "params": {
       "title": "title",
       "text": "text",
       "url": "url"
     }
   },
-  "file_handlers": [
+  
+  "protocol_handlers": [
     {
-      "action": "/?import-tasks",
-      "accept": {
-        "application/json": [".json", ".tasks"]
-      }
+      "protocol": "web+devops",
+      "url": "/?protocol=%s"
     }
   ],
+  
   "handle_links": "preferred",
   "launch_handler": {
     "client_mode": ["navigate-existing", "auto"]
   },
+  
   "edge_side_panel": {
     "preferred_width": 400
   },
+  
   "permissions": [
     "notifications",
     "clipboard-write",
-    "clipboard-read",
-    "background-sync",
-    "periodic-background-sync"
+    "clipboard-read"
   ],
+  
+  "related_applications": [],
+  "prefer_related_applications": false,
+  
   "serviceworker": {
     "src": "service-worker.js",
     "scope": "/",
     "use_cache": true
   },
+  
   "capture_links": "new-client",
   "isolated_storage": true,
   "fingerprints": false,
+  
   "version": "3.0.0",
   "author": "DevOps Team",
-  "homepage_url": "https://devops-dashboard.example.com",
+  
   "developer": {
     "name": "DevOps Solutions Inc.",
     "url": "https://devops-solutions.example.com"
   },
+  
   "features": [
     "cross-origin-isolated",
-    "serial",
-    "shared-array-buffers"
+    "serial"
   ],
+  
   "platform": "web",
   "iarc_rating_id": "e84b072d-719b-4573-9500-0cabd1b9b941"
 }

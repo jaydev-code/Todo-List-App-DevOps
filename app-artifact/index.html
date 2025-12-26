@@ -33,6 +33,10 @@
                 <button class="btn-icon" id="install-btn" aria-label="Install app" style="display: none;">
                     <i class="fas fa-download"></i>
                 </button>
+                <button class="btn-icon" id="notifications-btn" aria-label="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge hidden">3</span>
+                </button>
                 <button class="btn-icon" id="theme-toggle" aria-label="Toggle theme">
                     <i class="fas fa-moon"></i>
                 </button>
@@ -63,15 +67,18 @@
                 <div class="env-badges">
                     <button class="env-badge prod active" data-env="prod">
                         <i class="fas fa-rocket"></i>
-                        Production
+                        <span class="env-name">Production</span>
+                        <span class="env-status online"></span>
                     </button>
                     <button class="env-badge staging" data-env="staging">
                         <i class="fas fa-flask"></i>
-                        Staging
+                        <span class="env-name">Staging</span>
+                        <span class="env-status warning"></span>
                     </button>
                     <button class="env-badge dev" data-env="dev">
                         <i class="fas fa-code"></i>
-                        Development
+                        <span class="env-name">Development</span>
+                        <span class="env-status online"></span>
                     </button>
                 </div>
             </div>
@@ -149,6 +156,20 @@
 
         <!-- Main Content -->
         <div class="main-content">
+            <!-- Welcome Banner -->
+            <div class="welcome-banner">
+                <div class="welcome-content">
+                    <h1><i class="fas fa-hand-wave"></i> Welcome to DevOps Dashboard</h1>
+                    <p>Manage your tasks, monitor deployments, and automate workflows</p>
+                </div>
+                <div class="welcome-actions">
+                    <button class="btn-outline" id="quick-tour">
+                        <i class="fas fa-play-circle"></i>
+                        Quick Tour
+                    </button>
+                </div>
+            </div>
+
             <!-- Task Management Section -->
             <section class="card task-card">
                 <div class="card-header">
@@ -168,9 +189,14 @@
                                 <span>Done</span>
                             </button>
                         </div>
-                        <button class="btn-icon" id="search-toggle" aria-label="Search tasks">
-                            <i class="fas fa-search"></i>
-                        </button>
+                        <div class="task-actions-group">
+                            <button class="btn-icon" id="search-toggle" aria-label="Search tasks">
+                                <i class="fas fa-search"></i>
+                            </button>
+                            <button class="btn-icon" id="sort-tasks" aria-label="Sort tasks">
+                                <i class="fas fa-sort-amount-down"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -198,17 +224,22 @@
                                aria-label="New task">
                     </div>
                     <div class="task-input-controls">
-                        <select id="priority-select" class="priority-select">
-                            <option value="normal">
-                                <i class="fas fa-circle"></i> Normal
-                            </option>
-                            <option value="high">
-                                <i class="fas fa-exclamation"></i> High
-                            </option>
-                            <option value="critical">
-                                <i class="fas fa-exclamation-triangle"></i> Critical
-                            </option>
-                        </select>
+                        <div class="priority-select-wrapper">
+                            <select id="priority-select" class="priority-select">
+                                <option value="normal">
+                                    <i class="fas fa-circle"></i> Normal
+                                </option>
+                                <option value="high">
+                                    <i class="fas fa-exclamation"></i> High
+                                </option>
+                                <option value="critical">
+                                    <i class="fas fa-exclamation-triangle"></i> Critical
+                                </option>
+                            </select>
+                        </div>
+                        <div class="date-input-wrapper">
+                            <input type="date" id="task-deadline" class="date-input">
+                        </div>
                         <button id="add-btn" class="btn-primary">
                             <i class="fas fa-plus-circle"></i>
                             <span>Add Task</span>
@@ -218,6 +249,13 @@
 
                 <!-- Task List -->
                 <div class="task-list-container">
+                    <div class="task-list-header">
+                        <span class="task-count" id="task-count">0 tasks</span>
+                        <button class="btn-text" id="bulk-actions">
+                            <i class="fas fa-ellipsis-v"></i>
+                            Bulk Actions
+                        </button>
+                    </div>
                     <ul id="todo-list" class="task-list">
                         <!-- Tasks will be injected here by JavaScript -->
                     </ul>
@@ -225,24 +263,97 @@
 
                 <!-- Empty State -->
                 <div id="empty-state" class="empty-state">
-                    <i class="fas fa-check-circle"></i>
+                    <div class="empty-state-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
                     <h3>No tasks found</h3>
                     <p>All DevOps tasks are completed and deployed successfully.</p>
+                    <button class="btn-outline" id="add-sample-tasks">
+                        <i class="fas fa-magic"></i>
+                        Add Sample Tasks
+                    </button>
                 </div>
             </section>
 
-            <!-- Activity Feed -->
-            <section class="card activity-card">
-                <div class="card-header">
-                    <h2><i class="fas fa-history"></i> Recent Activity</h2>
-                    <button class="btn-icon" id="refresh-activity" aria-label="Refresh activity">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
-                </div>
-                <div class="activity-feed" id="activity-feed">
-                    <!-- Activities will be loaded by JavaScript -->
-                </div>
-            </section>
+            <!-- Activity Feed & Performance -->
+            <div class="content-grid">
+                <!-- Activity Feed -->
+                <section class="card activity-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-history"></i> Recent Activity</h2>
+                        <div class="card-actions">
+                            <button class="btn-icon" id="refresh-activity" aria-label="Refresh activity">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button class="btn-icon" id="activity-filter" aria-label="Filter activity">
+                                <i class="fas fa-filter"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="activity-feed" id="activity-feed">
+                        <!-- Activities will be loaded by JavaScript -->
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn-text" id="view-all-activity">
+                            View All Activity
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Performance Metrics -->
+                <section class="card metrics-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-chart-pie"></i> Performance Metrics</h2>
+                        <select class="time-select" id="time-select">
+                            <option value="24h">Last 24 Hours</option>
+                            <option value="7d">Last 7 Days</option>
+                            <option value="30d">Last 30 Days</option>
+                        </select>
+                    </div>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-icon success">
+                                <i class="fas fa-check-double"></i>
+                            </div>
+                            <div class="metric-content">
+                                <span class="metric-value" id="success-rate">98%</span>
+                                <span class="metric-label">Success Rate</span>
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-icon warning">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="metric-content">
+                                <span class="metric-value" id="avg-response">1.2s</span>
+                                <span class="metric-label">Avg Response</span>
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-icon error">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="metric-content">
+                                <span class="metric-value" id="error-count">12</span>
+                                <span class="metric-label">Errors Today</span>
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-icon info">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="metric-content">
+                                <span class="metric-value" id="active-users">42</span>
+                                <span class="metric-label">Active Users</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="performance-chart"></canvas>
+                    </div>
+                </section>
+            </div>
         </div>
     </main>
 
@@ -257,7 +368,7 @@
                 <span class="footer-separator">|</span>
                 <span class="footer-item">
                     <i class="fas fa-tag"></i>
-                    <span id="version-tag" class="version">v2.1.0</span>
+                    <span id="version-tag" class="version">v3.0.0</span>
                 </span>
                 <span class="footer-separator">|</span>
                 <span class="footer-item">
@@ -284,6 +395,20 @@
     <!-- Loading Spinner -->
     <div id="loading-spinner" class="loading-spinner hidden">
         <div class="spinner"></div>
+        <p class="loading-text">Processing...</p>
+    </div>
+
+    <!-- Notification Panel -->
+    <div class="notification-panel hidden" id="notification-panel">
+        <div class="notification-header">
+            <h3><i class="fas fa-bell"></i> Notifications</h3>
+            <button class="btn-icon" id="close-notifications">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notification-list" id="notification-list">
+            <!-- Notifications will be loaded here -->
+        </div>
     </div>
 
     <script src="app.js"></script>
@@ -291,7 +416,14 @@
         // Service Worker Registration
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('service-worker.js')
-                .then(reg => console.log('✅ Service Worker registered:', reg))
+                .then(reg => {
+                    console.log('✅ Service Worker registered:', reg);
+                    // Check for updates
+                    reg.addEventListener('updatefound', () => {
+                        console.log('🔄 Service Worker update found!');
+                        showToast('Update Available', 'New version is downloading...', 'info');
+                    });
+                })
                 .catch(err => console.log('❌ Service Worker registration failed:', err));
         }
 
@@ -302,7 +434,7 @@
             deferredPrompt = e;
             const installBtn = document.getElementById('install-btn');
             if (installBtn) {
-                installBtn.style.display = 'block';
+                installBtn.style.display = 'flex';
             }
         });
 
@@ -313,6 +445,14 @@
                 console.log(`User response: ${outcome}`);
                 deferredPrompt = null;
                 document.getElementById('install-btn').style.display = 'none';
+            }
+        });
+
+        // Handle app installed event
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA was installed');
+            if (window.app) {
+                window.app.showToast('Installed!', 'DevOps Dashboard installed successfully', 'success');
             }
         });
     </script>
