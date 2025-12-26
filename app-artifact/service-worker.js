@@ -66,6 +66,30 @@ self.addEventListener('fetch', event => {
     // Skip analytics
     if (event.request.url.includes('analytics')) return;
     
+    // For mobile performance, use cache first for static assets
+    if (event.request.url.includes('fonts.googleapis.com') || 
+        event.request.url.includes('cdnjs.cloudflare.com')) {
+        event.respondWith(
+            caches.match(event.request)
+                .then(cachedResponse => {
+                    if (cachedResponse) {
+                        return cachedResponse;
+                    }
+                    
+                    return fetch(event.request).then(response => {
+                        // Cache the response for future use
+                        const responseToCache = response.clone();
+                        caches.open(CACHE_NAME)
+                            .then(cache => {
+                                cache.put(event.request, responseToCache);
+                            });
+                        return response;
+                    });
+                })
+        );
+        return;
+    }
+    
     event.respondWith(
         fetch(event.request)
             .then(response => {
@@ -121,7 +145,7 @@ self.addEventListener('sync', event => {
     }
 });
 
-// Push notifications
+// Push notifications optimized for mobile
 self.addEventListener('push', event => {
     console.log('📨 Push notification received');
     
@@ -130,7 +154,8 @@ self.addEventListener('push', event => {
         body: 'New notification',
         icon: './icons/icon-192x192.png',
         badge: './icons/badge-96x96.png',
-        tag: 'devops-notification'
+        tag: 'devops-notification',
+        vibrate: [100, 50, 100]
     };
     
     if (event.data) {
@@ -145,7 +170,7 @@ self.addEventListener('push', event => {
         body: data.body,
         icon: data.icon,
         badge: data.badge,
-        vibrate: [100, 50, 100],
+        vibrate: data.vibrate,
         data: {
             dateOfArrival: Date.now(),
             primaryKey: data.tag || 'devops-notification',
@@ -164,7 +189,7 @@ self.addEventListener('push', event => {
     );
 });
 
-// Notification click handler
+// Notification click handler optimized for mobile
 self.addEventListener('notificationclick', event => {
     console.log('👆 Notification clicked:', event.notification.tag);
     
@@ -172,105 +197,27 @@ self.addEventListener('notificationclick', event => {
 
     const urlToOpen = event.notification.data?.url || './';
 
-    if (event.action === 'open') {
-        event.waitUntil(
-            clients.matchAll({ 
-                type: 'window',
-                includeUncontrolled: true 
-            })
-            .then(clientList => {
-                // Check if there's already a window/tab open with the target URL
-                for (const client of clientList) {
-                    if (client.url.includes(urlToOpen) && 'focus' in client) {
-                        return client.focus();
-                    }
+    event.waitUntil(
+        clients.matchAll({ 
+            type: 'window',
+            includeUncontrolled: true 
+        })
+        .then(clientList => {
+            // Check if there's already a window/tab open with the target URL
+            for (const client of clientList) {
+                if (client.url.includes(urlToOpen) && 'focus' in client) {
+                    return client.focus();
                 }
-                // If not, open a new window/tab
-                if (clients.openWindow) {
-                    return clients.openWindow(urlToOpen);
-                }
-            })
-        );
-    }
+            }
+            // If not, open a new window/tab
+            if (clients.openWindow) {
+                return clients.openWindow(urlToOpen);
+            }
+        })
+    );
 });
 
-// Periodic background sync (if supported)
-if ('periodicSync' in self.registration) {
-    self.addEventListener('periodicsync', event => {
-        if (event.tag === 'update-data') {
-            event.waitUntil(updateCachedData());
-        }
-    });
-}
-
-// Sync pending tasks (example implementation)
-async function syncPendingTasks() {
-    console.log('🔄 Syncing pending tasks in background...');
-    
-    // Get pending tasks from IndexedDB or localStorage
-    const pendingTasks = await getPendingTasks();
-    
-    if (pendingTasks.length > 0) {
-        // In a real app, you would send these to your backend API
-        console.log(`📤 Syncing ${pendingTasks.length} pending tasks`);
-        
-        // Simulate API call
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                console.log('✅ Tasks synced successfully');
-                clearPendingTasks();
-                resolve();
-            }, 2000);
-        });
-    }
-    
-    return Promise.resolve();
-}
-
-// Sync activities
-async function syncActivities() {
-    console.log('🔄 Syncing activities in background...');
-    // Implementation for syncing activities
-    return Promise.resolve();
-}
-
-// Update cached data periodically
-async function updateCachedData() {
-    console.log('🔄 Updating cached data periodically...');
-    
-    try {
-        const cache = await caches.open(CACHE_NAME);
-        const requests = STATIC_ASSETS.map(url => new Request(url));
-        
-        for (const request of requests) {
-            try {
-                const response = await fetch(request);
-                if (response.ok) {
-                    await cache.put(request, response);
-                }
-            } catch (error) {
-                console.log(`Failed to update: ${request.url}`, error);
-            }
-        }
-        
-        console.log('✅ Cached data updated');
-    } catch (error) {
-        console.error('❌ Failed to update cached data:', error);
-    }
-}
-
-// Helper functions
-async function getPendingTasks() {
-    // In a real app, this would read from IndexedDB
-    return JSON.parse(localStorage.getItem('pendingTasks') || '[]');
-}
-
-async function clearPendingTasks() {
-    // In a real app, this would clear from IndexedDB
-    localStorage.removeItem('pendingTasks');
-}
-
-// Handle messages from the main thread
+// Handle messages from the main thread for mobile
 self.addEventListener('message', event => {
     console.log('📨 Message from main thread:', event.data);
     
@@ -291,6 +238,44 @@ self.addEventListener('message', event => {
         });
     }
 });
+
+// Sync pending tasks (example implementation)
+async function syncPendingTasks() {
+    console.log('🔄 Syncing pending tasks in background...');
+    
+    // Get pending tasks from IndexedDB or localStorage
+    const pendingTasks = await getPendingTasks();
+    
+    if (pendingTasks.length > 0) {
+        console.log(`📤 Syncing ${pendingTasks.length} pending tasks`);
+        
+        // Simulate API call
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                console.log('✅ Tasks synced successfully');
+                clearPendingTasks();
+                resolve();
+            }, 2000);
+        });
+    }
+    
+    return Promise.resolve();
+}
+
+// Sync activities
+async function syncActivities() {
+    console.log('🔄 Syncing activities in background...');
+    return Promise.resolve();
+}
+
+// Helper functions
+async function getPendingTasks() {
+    return JSON.parse(localStorage.getItem('pendingTasks') || '[]');
+}
+
+async function clearPendingTasks() {
+    localStorage.removeItem('pendingTasks');
+}
 
 // Error handling
 self.addEventListener('error', event => {

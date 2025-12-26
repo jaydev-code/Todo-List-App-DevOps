@@ -1,6 +1,15 @@
-/* ===================================
-   CSS Variables & Theme System
-   =================================== */
+/* ===== CSS Reset & Base Styles ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+}
+
 :root {
     /* Color Palette */
     --primary: #2563eb;
@@ -59,10 +68,8 @@
     --z-popover: 1060;
     --z-tooltip: 1070;
     
-    /* Responsive Breakpoints */
-    --mobile: 768px;
-    --tablet: 1024px;
-    --desktop: 1280px;
+    /* Mobile Touch */
+    --touch-target: 44px;
 }
 
 /* Dark Theme */
@@ -77,20 +84,13 @@
     --shadow: rgba(0, 0, 0, 0.3);
 }
 
-/* ===================================
-   Base Styles & Reset
-   =================================== */
-*, *::before, *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
+/* ===== BASE STYLES ===== */
 html {
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
+    touch-action: manipulation;
 }
 
 body {
@@ -105,9 +105,61 @@ body {
     transition: background-color var(--transition-base);
 }
 
-/* ===================================
-   Navigation Bar
-   =================================== */
+/* Allow text selection in inputs */
+input, 
+textarea, 
+[contenteditable="true"] {
+    -webkit-user-select: text !important;
+    user-select: text !important;
+}
+
+/* ===== TOUCH FIX: Make all interactive elements touch-friendly ===== */
+button,
+.btn-icon,
+.btn-primary,
+.btn-secondary,
+.btn-outline,
+.btn-text,
+.filter-btn,
+.task-action-btn,
+.env-badge,
+.quick-actions-grid button,
+.toast-close,
+.notification-dismiss,
+.mobile-menu-toggle,
+.sidebar-close,
+#add-btn,
+#clear-search,
+#search-toggle,
+#sort-tasks,
+#bulk-actions,
+#add-sample-tasks,
+#quick-tour,
+#quick-deploy,
+#run-tests,
+#backup-now,
+#clear-completed,
+#refresh-activity,
+#activity-filter,
+#view-all-activity,
+#close-notifications {
+    min-height: var(--touch-target) !important;
+    min-width: var(--touch-target) !important;
+    cursor: pointer !important;
+    position: relative;
+}
+
+/* Fix for iOS Safari button styling */
+button {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+/* ===== NAVIGATION BAR ===== */
 .navbar {
     background: var(--bg-primary);
     border-bottom: 1px solid var(--border);
@@ -166,19 +218,21 @@ body {
 
 .mobile-menu-toggle {
     display: none;
-    background: none;
-    border: none;
-    font-size: 1.5rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    font-size: 1.25rem;
     color: var(--text-primary);
     cursor: pointer;
     padding: var(--spacing-sm);
     margin-right: var(--spacing-sm);
-    border-radius: var(--radius-sm);
-    transition: background-color var(--transition-fast);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
 }
 
-.mobile-menu-toggle:hover {
-    background-color: var(--bg-tertiary);
+.mobile-menu-toggle:hover,
+.mobile-menu-toggle:active {
+    background: var(--bg-tertiary);
+    transform: scale(0.98);
 }
 
 .nav-actions {
@@ -192,8 +246,8 @@ body {
     background: var(--bg-secondary);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    width: 40px;
-    height: 40px;
+    width: var(--touch-target);
+    height: var(--touch-target);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -202,14 +256,11 @@ body {
     color: var(--text-primary);
 }
 
-.btn-icon:hover {
+.btn-icon:hover,
+.btn-icon:active {
     background: var(--bg-tertiary);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px var(--shadow);
-}
-
-.btn-icon:active {
-    transform: translateY(0);
 }
 
 .notification-badge {
@@ -227,6 +278,7 @@ body {
     align-items: center;
     justify-content: center;
     border: 2px solid var(--bg-primary);
+    pointer-events: none;
 }
 
 .status-indicator {
@@ -238,10 +290,8 @@ body {
     border-radius: var(--radius-md);
     border: 1px solid var(--border);
     transition: all var(--transition-base);
-}
-
-.status-indicator:hover {
-    background: var(--bg-tertiary);
+    cursor: default;
+    min-height: var(--touch-target);
 }
 
 .status-dot {
@@ -276,9 +326,7 @@ body {
     }
 }
 
-/* ===================================
-   Dashboard Layout
-   =================================== */
+/* ===== DASHBOARD LAYOUT ===== */
 .dashboard {
     display: grid;
     grid-template-columns: 320px 1fr;
@@ -290,9 +338,7 @@ body {
     transition: all var(--transition-base);
 }
 
-/* ===================================
-   Sidebar
-   =================================== */
+/* ===== SIDEBAR ===== */
 .sidebar {
     background: var(--bg-primary);
     border-radius: var(--radius-xl);
@@ -323,18 +369,19 @@ body {
 }
 
 .sidebar-close {
-    background: none;
-    border: none;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
     font-size: 1.25rem;
     color: var(--text-secondary);
     cursor: pointer;
     padding: var(--spacing-sm);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     transition: all var(--transition-fast);
 }
 
-.sidebar-close:hover {
-    background-color: var(--bg-tertiary);
+.sidebar-close:hover,
+.sidebar-close:active {
+    background: var(--bg-tertiary);
     color: var(--text-primary);
 }
 
@@ -382,9 +429,11 @@ body {
     gap: var(--spacing-md);
     background: var(--bg-secondary);
     position: relative;
+    min-height: var(--touch-target);
 }
 
-.env-badge:hover {
+.env-badge:hover,
+.env-badge:active {
     transform: translateX(4px);
     box-shadow: 0 4px 12px var(--shadow);
 }
@@ -457,6 +506,7 @@ body {
     display: inline-flex;
     border: none;
     gap: var(--spacing-xs);
+    min-height: auto;
 }
 
 /* Stats Card */
@@ -474,9 +524,11 @@ body {
     border-radius: var(--radius-lg);
     transition: all var(--transition-base);
     cursor: pointer;
+    min-height: var(--touch-target);
 }
 
-.stat-item:hover {
+.stat-item:hover,
+.stat-item:active {
     transform: translateX(4px);
     box-shadow: 0 6px 16px var(--shadow);
     background: var(--bg-tertiary);
@@ -493,7 +545,8 @@ body {
     transition: all var(--transition-base);
 }
 
-.stat-item:hover .stat-icon {
+.stat-item:hover .stat-icon,
+.stat-item:active .stat-icon {
     transform: scale(1.1);
 }
 
@@ -559,10 +612,11 @@ body {
     align-items: center;
     gap: var(--spacing-sm);
     justify-content: flex-start;
-    min-height: 44px;
+    min-height: var(--touch-target);
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover,
+.btn-secondary:active {
     background: var(--primary);
     color: white;
     transform: translateY(-2px);
@@ -570,22 +624,17 @@ body {
     border-color: var(--primary);
 }
 
-.btn-secondary:active {
-    transform: translateY(0);
-}
-
 .btn-secondary i {
     font-size: 1rem;
     transition: transform var(--transition-fast);
 }
 
-.btn-secondary:hover i {
+.btn-secondary:hover i,
+.btn-secondary:active i {
     transform: scale(1.1);
 }
 
-/* ===================================
-   Main Content
-   =================================== */
+/* ===== MAIN CONTENT ===== */
 .main-content {
     display: flex;
     flex-direction: column;
@@ -643,9 +692,11 @@ body {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
+    min-height: var(--touch-target);
 }
 
-.btn-outline:hover {
+.btn-outline:hover,
+.btn-outline:active {
     background: white;
     color: var(--primary);
     transform: translateY(-2px);
@@ -723,10 +774,11 @@ body {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    min-height: 36px;
+    min-height: var(--touch-target);
 }
 
-.filter-btn:hover {
+.filter-btn:hover,
+.filter-btn:active {
     color: var(--text-primary);
     background: var(--bg-tertiary);
 }
@@ -788,23 +840,28 @@ body {
 .clear-search {
     position: absolute;
     right: var(--spacing-md);
-    background: none;
-    border: none;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
     color: var(--text-secondary);
     cursor: pointer;
     padding: var(--spacing-sm);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     transition: all var(--transition-fast);
     display: none;
+    min-height: var(--touch-target);
+    min-width: var(--touch-target);
 }
 
-.clear-search:hover {
+.clear-search:hover,
+.clear-search:active {
     color: var(--text-primary);
     background: var(--bg-tertiary);
 }
 
 .search-bar.active .clear-search {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Task Input */
@@ -845,6 +902,7 @@ body {
     background-position: right var(--spacing-md) center;
     background-size: 16px;
     padding-right: 2.5rem;
+    min-height: var(--touch-target);
 }
 
 .priority-select:focus {
@@ -864,6 +922,7 @@ body {
     background: var(--bg-secondary);
     color: var(--text-primary);
     transition: all var(--transition-base);
+    min-height: var(--touch-target);
 }
 
 .date-input:focus {
@@ -887,17 +946,14 @@ body {
     align-items: center;
     gap: var(--spacing-sm);
     white-space: nowrap;
-    min-height: 44px;
+    min-height: var(--touch-target);
 }
 
-.btn-primary:hover {
+.btn-primary:hover,
+.btn-primary:active {
     background: var(--primary-dark);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-}
-
-.btn-primary:active {
-    transform: translateY(0);
 }
 
 .btn-primary i {
@@ -905,7 +961,8 @@ body {
     transition: transform var(--transition-fast);
 }
 
-.btn-primary:hover i {
+.btn-primary:hover i,
+.btn-primary:active i {
     transform: scale(1.1);
 }
 
@@ -916,6 +973,7 @@ body {
     margin-bottom: var(--spacing-lg);
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
+    -webkit-overflow-scrolling: touch;
 }
 
 .task-list-container::-webkit-scrollbar {
@@ -959,9 +1017,11 @@ body {
     padding: var(--spacing-sm);
     border-radius: var(--radius-sm);
     transition: all var(--transition-fast);
+    min-height: var(--touch-target);
 }
 
-.btn-text:hover {
+.btn-text:hover,
+.btn-text:active {
     background: var(--bg-tertiary);
     color: var(--primary-dark);
 }
@@ -986,6 +1046,8 @@ body {
     cursor: pointer;
     position: relative;
     overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .task-item::before {
@@ -1011,7 +1073,8 @@ body {
     background: var(--success);
 }
 
-.task-item:hover {
+.task-item:hover,
+.task-item:active {
     border-color: var(--primary);
     box-shadow: 0 6px 20px var(--shadow);
     transform: translateY(-2px);
@@ -1032,9 +1095,10 @@ body {
     }
 }
 
+/* TOUCH FIX: Task Checkbox */
 .task-checkbox {
-    width: 24px;
-    height: 24px;
+    width: var(--touch-target);
+    height: var(--touch-target);
     border: 2px solid var(--border);
     border-radius: var(--radius-md);
     display: flex;
@@ -1047,7 +1111,8 @@ body {
     background: var(--bg-primary);
 }
 
-.task-checkbox:hover {
+.task-checkbox:hover,
+.task-checkbox:active {
     border-color: var(--primary);
     transform: scale(1.1);
 }
@@ -1063,7 +1128,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
-    min-width: 0; /* For text overflow */
+    min-width: 0;
 }
 
 .task-text {
@@ -1173,8 +1238,8 @@ body {
 }
 
 .task-action-btn {
-    width: 36px;
-    height: 36px;
+    width: var(--touch-target);
+    height: var(--touch-target);
     border: none;
     border-radius: var(--radius-md);
     background: var(--bg-tertiary);
@@ -1186,16 +1251,19 @@ body {
     justify-content: center;
 }
 
-.task-action-btn:hover {
+.task-action-btn:hover,
+.task-action-btn:active {
     transform: scale(1.1);
 }
 
-.task-action-btn.edit:hover {
+.task-action-btn.edit:hover,
+.task-action-btn.edit:active {
     background: var(--primary);
     color: white;
 }
 
-.task-action-btn.delete:hover {
+.task-action-btn.delete:hover,
+.task-action-btn.delete:active {
     background: var(--error);
     color: white;
 }
@@ -1258,6 +1326,7 @@ body {
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
     padding-right: var(--spacing-sm);
+    -webkit-overflow-scrolling: touch;
 }
 
 .activity-feed::-webkit-scrollbar {
@@ -1281,16 +1350,19 @@ body {
     border-radius: var(--radius-lg);
     transition: all var(--transition-base);
     animation: slideIn 0.3s ease;
+    cursor: pointer;
+    min-height: var(--touch-target);
 }
 
-.activity-item:hover {
+.activity-item:hover,
+.activity-item:active {
     box-shadow: 0 4px 12px var(--shadow);
     transform: translateX(2px);
 }
 
 .activity-icon {
-    width: 40px;
-    height: 40px;
+    width: var(--touch-target);
+    height: var(--touch-target);
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
@@ -1369,6 +1441,7 @@ body {
     appearance: none;
     -webkit-appearance: none;
     min-width: 140px;
+    min-height: var(--touch-target);
 }
 
 .time-select:focus {
@@ -1393,17 +1466,20 @@ body {
     background: var(--bg-secondary);
     border-radius: var(--radius-lg);
     transition: all var(--transition-base);
+    cursor: pointer;
+    min-height: var(--touch-target);
 }
 
-.metric-item:hover {
+.metric-item:hover,
+.metric-item:active {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px var(--shadow);
     background: var(--bg-tertiary);
 }
 
 .metric-icon {
-    width: 48px;
-    height: 48px;
+    width: var(--touch-target);
+    height: var(--touch-target);
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
@@ -1463,9 +1539,7 @@ body {
     height: 100% !important;
 }
 
-/* ===================================
-   Footer
-   =================================== */
+/* ===== FOOTER ===== */
 .footer {
     background: var(--bg-primary);
     border-top: 1px solid var(--border);
@@ -1533,9 +1607,7 @@ body {
     animation: pulse 2s ease-in-out infinite;
 }
 
-/* ===================================
-   Toast Notifications
-   =================================== */
+/* ===== TOAST NOTIFICATIONS ===== */
 .toast-container {
     position: fixed;
     top: var(--spacing-xl);
@@ -1564,7 +1636,8 @@ body {
     transition: transform var(--transition-base);
 }
 
-.toast:hover {
+.toast:hover,
+.toast:active {
     transform: translateX(-4px);
 }
 
@@ -1636,24 +1709,26 @@ body {
 }
 
 .toast-close {
-    background: none;
-    border: none;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
     color: var(--text-tertiary);
     cursor: pointer;
     padding: var(--spacing-xs);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     transition: all var(--transition-fast);
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.toast-close:hover {
+.toast-close:hover,
+.toast-close:active {
     color: var(--text-primary);
     background: var(--bg-tertiary);
 }
 
-/* ===================================
-   Loading Spinner
-   =================================== */
+/* ===== LOADING SPINNER ===== */
 .loading-spinner {
     position: fixed;
     top: 0;
@@ -1695,9 +1770,7 @@ body {
     50% { opacity: 1; }
 }
 
-/* ===================================
-   Notification Panel
-   =================================== */
+/* ===== NOTIFICATION PANEL ===== */
 .notification-panel {
     position: fixed;
     top: 70px;
@@ -1736,6 +1809,7 @@ body {
     overflow-y: auto;
     max-height: 400px;
     padding: var(--spacing-md);
+    -webkit-overflow-scrolling: touch;
 }
 
 .notification-empty {
@@ -1762,9 +1836,12 @@ body {
     display: flex;
     gap: var(--spacing-md);
     transition: all var(--transition-base);
+    cursor: pointer;
+    min-height: var(--touch-target);
 }
 
-.notification-item:hover {
+.notification-item:hover,
+.notification-item:active {
     background: var(--bg-tertiary);
     transform: translateX(-2px);
 }
@@ -1774,8 +1851,8 @@ body {
 }
 
 .notification-icon {
-    width: 36px;
-    height: 36px;
+    width: var(--touch-target);
+    height: var(--touch-target);
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
@@ -1834,25 +1911,27 @@ body {
 }
 
 .notification-dismiss {
-    background: none;
-    border: none;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
     color: var(--text-tertiary);
     cursor: pointer;
     padding: var(--spacing-xs);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     transition: all var(--transition-fast);
     align-self: flex-start;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.notification-dismiss:hover {
+.notification-dismiss:hover,
+.notification-dismiss:active {
     color: var(--text-primary);
-    background: var(--bg-tertiary);
+    background: var(--error);
 }
 
-/* ===================================
-   Mobile Overlay
-   =================================== */
+/* ===== MOBILE OVERLAY ===== */
 .mobile-overlay {
     display: none;
     position: fixed;
@@ -1865,15 +1944,14 @@ body {
     opacity: 0;
     transition: opacity var(--transition-base);
     backdrop-filter: blur(2px);
+    cursor: pointer;
 }
 
 .mobile-overlay.active {
     opacity: 1;
 }
 
-/* ===================================
-   Utility Classes
-   =================================== */
+/* ===== UTILITY CLASSES ===== */
 .hidden {
     display: none !important;
 }
@@ -1888,9 +1966,7 @@ body {
     50% { box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.3); }
 }
 
-/* ===================================
-   Responsive Design
-   =================================== */
+/* ===== RESPONSIVE DESIGN ===== */
 
 /* Tablets and Small Laptops */
 @media (max-width: 1024px) {
@@ -1911,6 +1987,7 @@ body {
         padding: var(--spacing-xl);
         transition: left var(--transition-base);
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
     
     .sidebar.active {
@@ -1989,6 +2066,7 @@ body {
         left: var(--spacing-md);
         right: var(--spacing-md);
         width: auto;
+        top: var(--spacing-md);
     }
 }
 
@@ -2047,6 +2125,15 @@ body {
     .sidebar {
         width: 100%;
     }
+    
+    .task-item {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+    
+    .task-actions {
+        align-self: flex-end;
+    }
 }
 
 /* Large Desktop */
@@ -2062,14 +2149,15 @@ body {
     .btn-primary,
     .btn-secondary,
     .task-action-btn,
-    .filter-btn {
-        min-height: 44px;
-        min-width: 44px;
+    .filter-btn,
+    .env-badge {
+        min-height: 48px !important;
+        min-width: 48px !important;
     }
     
     .task-checkbox {
-        width: 32px;
-        height: 32px;
+        width: 48px;
+        height: 48px;
     }
     
     .task-item {
@@ -2085,6 +2173,18 @@ body {
     .toast-container {
         bottom: var(--spacing-md);
         top: auto;
+    }
+    
+    /* Add touch feedback */
+    button:active,
+    .btn-icon:active,
+    .btn-primary:active,
+    .btn-secondary:active,
+    .task-action-btn:active,
+    .env-badge:active,
+    .filter-btn:active {
+        opacity: 0.7;
+        transform: scale(0.98);
     }
 }
 

@@ -159,69 +159,97 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('✅ DevOps Dashboard initialized successfully');
     }
 
-    // Setup Event Listeners
+    // ===== MOBILE TOUCH FIXES =====
+    
+    // Setup Event Listeners with mobile touch support
     function setupEventListeners() {
         // Mobile Navigation
-        elements.mobileMenuToggle?.addEventListener('click', toggleMobileMenu);
-        elements.mobileOverlay?.addEventListener('click', closeMobileMenu);
-        elements.sidebarClose?.addEventListener('click', closeMobileMenu);
+        elements.mobileMenuToggle?.addEventListener('click', handleMobileTap);
+        elements.mobileMenuToggle?.addEventListener('touchstart', handleMobileTap);
+        
+        elements.mobileOverlay?.addEventListener('click', handleMobileTap);
+        elements.mobileOverlay?.addEventListener('touchstart', handleMobileTap);
+        
+        elements.sidebarClose?.addEventListener('click', handleMobileTap);
+        elements.sidebarClose?.addEventListener('touchstart', handleMobileTap);
 
         // Task Management
         elements.addBtn?.addEventListener('click', addTask);
+        elements.addBtn?.addEventListener('touchstart', addTask);
+        
         elements.todoInput?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') addTask();
         });
+        
         elements.sortTasks?.addEventListener('click', toggleSort);
+        elements.sortTasks?.addEventListener('touchstart', toggleSort);
+        
         elements.bulkActions?.addEventListener('click', showBulkActions);
+        elements.bulkActions?.addEventListener('touchstart', showBulkActions);
+        
         elements.addSampleTasks?.addEventListener('click', addSampleTasks);
+        elements.addSampleTasks?.addEventListener('touchstart', addSampleTasks);
 
         // Filter Tasks
         elements.filterButtons?.forEach(btn => {
-            btn.addEventListener('click', () => {
-                elements.filterButtons.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                state.currentFilter = btn.dataset.filter;
-                renderTasks();
-            });
+            btn.addEventListener('click', handleFilterClick);
+            btn.addEventListener('touchstart', handleFilterTouch);
         });
 
         // Search Functionality
         elements.searchToggle?.addEventListener('click', toggleSearch);
+        elements.searchToggle?.addEventListener('touchstart', toggleSearch);
+        
         elements.searchInput?.addEventListener('input', handleSearch);
+        
         elements.clearSearch?.addEventListener('click', clearSearch);
+        elements.clearSearch?.addEventListener('touchstart', clearSearch);
 
         // Environment Selection
         elements.envBadges?.forEach(badge => {
-            badge.addEventListener('click', () => {
-                elements.envBadges.forEach(b => b.classList.remove('active'));
-                badge.classList.add('active');
-                state.currentEnv = badge.dataset.env;
-                logActivity(`Switched to ${badge.querySelector('.env-name').textContent} environment`, 'info');
-                showToast(`Environment Changed`, `Now viewing ${badge.querySelector('.env-name').textContent}`, 'info');
-            });
+            badge.addEventListener('click', handleEnvClick);
+            badge.addEventListener('touchstart', handleEnvTouch);
         });
 
         // Quick Actions
         elements.quickDeploy?.addEventListener('click', simulateDeployment);
+        elements.quickDeploy?.addEventListener('touchstart', simulateDeployment);
+        
         elements.runTests?.addEventListener('click', runTests);
+        elements.runTests?.addEventListener('touchstart', runTests);
+        
         elements.backupNow?.addEventListener('click', createBackup);
+        elements.backupNow?.addEventListener('touchstart', createBackup);
+        
         elements.clearCompleted?.addEventListener('click', clearCompletedTasks);
+        elements.clearCompleted?.addEventListener('touchstart', clearCompletedTasks);
 
         // Theme Toggle
         elements.themeToggle?.addEventListener('click', toggleTheme);
+        elements.themeToggle?.addEventListener('touchstart', toggleTheme);
 
         // Activity & Performance
         elements.refreshActivity?.addEventListener('click', updateActivityFeed);
+        elements.refreshActivity?.addEventListener('touchstart', updateActivityFeed);
+        
         elements.activityFilter?.addEventListener('click', filterActivity);
+        elements.activityFilter?.addEventListener('touchstart', filterActivity);
+        
         elements.viewAllActivity?.addEventListener('click', viewAllActivity);
+        elements.viewAllActivity?.addEventListener('touchstart', viewAllActivity);
+        
         elements.timeSelect?.addEventListener('change', updatePerformanceMetrics);
 
         // Notifications
         elements.notificationsBtn?.addEventListener('click', toggleNotifications);
+        elements.notificationsBtn?.addEventListener('touchstart', toggleNotifications);
+        
         elements.closeNotifications?.addEventListener('click', closeNotificationsPanel);
+        elements.closeNotifications?.addEventListener('touchstart', closeNotificationsPanel);
 
         // Tour
         elements.quickTour?.addEventListener('click', startQuickTour);
+        elements.quickTour?.addEventListener('touchstart', startQuickTour);
 
         // Online/Offline Events
         window.addEventListener('online', updateConnectionStatus);
@@ -258,6 +286,77 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Handle keyboard shortcuts
         document.addEventListener('keydown', handleKeyboardShortcuts);
+        
+        // Prevent unwanted zoom on mobile
+        preventMobileZoom();
+    }
+
+    // Mobile touch helper functions
+    function handleMobileTap(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (e.target === elements.mobileMenuToggle || e.target.closest('#mobile-menu-toggle')) {
+            toggleMobileMenu();
+        } else if (e.target === elements.mobileOverlay || e.target === elements.sidebarClose) {
+            closeMobileMenu();
+        }
+    }
+
+    function handleFilterClick(e) {
+        e.preventDefault();
+        const btn = e.target.closest('.filter-btn');
+        if (!btn) return;
+        
+        elements.filterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.currentFilter = btn.dataset.filter;
+        renderTasks();
+    }
+
+    function handleFilterTouch(e) {
+        e.preventDefault();
+        const btn = e.target.closest('.filter-btn');
+        if (!btn) return;
+        
+        // Add visual feedback
+        btn.classList.add('touch-active');
+        setTimeout(() => btn.classList.remove('touch-active'), 150);
+        
+        // Handle the action
+        elements.filterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.currentFilter = btn.dataset.filter;
+        renderTasks();
+    }
+
+    function handleEnvClick(e) {
+        e.preventDefault();
+        const badge = e.target.closest('.env-badge');
+        if (!badge) return;
+        
+        elements.envBadges.forEach(b => b.classList.remove('active'));
+        badge.classList.add('active');
+        state.currentEnv = badge.dataset.env;
+        logActivity(`Switched to ${badge.querySelector('.env-name').textContent} environment`, 'info');
+        showToast(`Environment Changed`, `Now viewing ${badge.querySelector('.env-name').textContent}`, 'info');
+    }
+
+    function handleEnvTouch(e) {
+        e.preventDefault();
+        const badge = e.target.closest('.env-badge');
+        if (!badge) return;
+        
+        // Add visual feedback
+        badge.classList.add('touch-active');
+        setTimeout(() => badge.classList.remove('touch-active'), 150);
+        
+        // Handle the action
+        elements.envBadges.forEach(b => b.classList.remove('active'));
+        badge.classList.add('active');
+        state.currentEnv = badge.dataset.env;
+        logActivity(`Switched to ${badge.querySelector('.env-name').textContent} environment`, 'info');
+        showToast(`Environment Changed`, `Now viewing ${badge.querySelector('.env-name').textContent}`, 'info');
     }
 
     // Task Management Functions
@@ -439,19 +538,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             
-            // Add event listeners
+            // Add event listeners with mobile touch support
             const checkbox = li.querySelector('.task-checkbox');
-            checkbox.addEventListener('click', () => toggleTaskCompletion(task.id));
+            checkbox.addEventListener('click', (e) => {
+                e.preventDefault();
+                toggleTaskCompletion(task.id);
+            });
+            checkbox.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                checkbox.classList.add('touch-active');
+                setTimeout(() => checkbox.classList.remove('touch-active'), 150);
+                toggleTaskCompletion(task.id);
+            });
             
             const editBtn = li.querySelector('.edit');
             editBtn.addEventListener('click', (e) => {
+                e.preventDefault();
                 e.stopPropagation();
+                editTask(task.id);
+            });
+            editBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                editBtn.classList.add('touch-active');
+                setTimeout(() => editBtn.classList.remove('touch-active'), 150);
                 editTask(task.id);
             });
             
             const deleteBtn = li.querySelector('.delete');
             deleteBtn.addEventListener('click', (e) => {
+                e.preventDefault();
                 e.stopPropagation();
+                deleteTask(task.id);
+            });
+            deleteBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                deleteBtn.classList.add('touch-active');
+                setTimeout(() => deleteBtn.classList.remove('touch-active'), 150);
                 deleteTask(task.id);
             });
             
@@ -700,6 +824,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             
+            // Add mobile touch support
+            activityItem.addEventListener('click', (e) => {
+                e.preventDefault();
+                showToast('Activity', activity.message, 'info');
+            });
+            
+            activityItem.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                activityItem.classList.add('touch-active');
+                setTimeout(() => activityItem.classList.remove('touch-active'), 150);
+                showToast('Activity', activity.message, 'info');
+            });
+            
             elements.activityFeed.appendChild(activityItem);
         });
     }
@@ -819,16 +956,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 </button>
             `;
             
+            // Add mobile touch support
+            notificationItem.addEventListener('click', (e) => {
+                if (!e.target.closest('.notification-dismiss')) {
+                    e.preventDefault();
+                    showToast(notification.title, notification.message, 'info');
+                }
+            });
+            
+            notificationItem.addEventListener('touchstart', (e) => {
+                if (!e.target.closest('.notification-dismiss')) {
+                    e.preventDefault();
+                    notificationItem.classList.add('touch-active');
+                    setTimeout(() => notificationItem.classList.remove('touch-active'), 150);
+                    showToast(notification.title, notification.message, 'info');
+                }
+            });
+            
             elements.notificationList.appendChild(notificationItem);
         });
         
         // Add dismiss event listeners
         document.querySelectorAll('.notification-dismiss').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = e.currentTarget.dataset.id;
-                dismissNotification(id);
-            });
+            btn.addEventListener('click', handleDismissNotification);
+            btn.addEventListener('touchstart', handleDismissNotification);
         });
+    }
+
+    function handleDismissNotification(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const id = e.currentTarget.dataset.id;
+        
+        // Add touch feedback
+        e.currentTarget.classList.add('touch-active');
+        setTimeout(() => e.currentTarget.classList.remove('touch-active'), 150);
+        
+        dismissNotification(id);
     }
 
     // Toast System
@@ -859,9 +1023,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         elements.toastContainer.appendChild(toast);
 
-        // Add close event
+        // Add close event with mobile support
         const closeBtn = toast.querySelector('.toast-close');
         closeBtn.addEventListener('click', () => toast.remove());
+        closeBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            toast.remove();
+        });
 
         // Auto-remove after 5 seconds
         setTimeout(() => {
@@ -1136,20 +1304,35 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.body.appendChild(modal);
         
-        // Add event listeners
+        // Add event listeners with mobile support
         modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
+        modal.querySelector('.modal-close').addEventListener('touchstart', () => modal.remove());
+        
         modal.querySelectorAll('.modal-action-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const action = btn.dataset.action;
-                handleBulkAction(action);
-                modal.remove();
-            });
+            btn.addEventListener('click', handleModalAction);
+            btn.addEventListener('touchstart', handleModalAction);
         });
         
         // Close on outside click
         modal.addEventListener('click', (e) => {
             if (e.target === modal) modal.remove();
         });
+        
+        modal.addEventListener('touchstart', (e) => {
+            if (e.target === modal) modal.remove();
+        });
+    }
+
+    function handleModalAction(e) {
+        e.preventDefault();
+        const action = e.currentTarget.dataset.action;
+        
+        // Add touch feedback
+        e.currentTarget.classList.add('touch-active');
+        setTimeout(() => e.currentTarget.classList.remove('touch-active'), 150);
+        
+        handleBulkAction(action);
+        e.currentTarget.closest('.bulk-actions-modal').remove();
     }
 
     function handleBulkAction(action) {
@@ -1279,6 +1462,26 @@ document.addEventListener('DOMContentLoaded', () => {
             closeMobileMenu();
             closeNotificationsPanel();
         }
+    }
+
+    // Mobile-specific fixes
+    function preventMobileZoom() {
+        // Prevent double-tap zoom
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, { passive: false });
+
+        // Prevent pinch zoom on interactive elements
+        document.addEventListener('touchmove', function(event) {
+            if (event.scale !== 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
     }
 
     // Utility Functions
