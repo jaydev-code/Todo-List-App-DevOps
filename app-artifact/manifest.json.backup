@@ -4,14 +4,14 @@
   "description": "Mobile-first DevOps task manager with offline support",
   "start_url": "./",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone"],
-  "orientation": "portrait",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "theme_color": "#2563eb",
   "background_color": "#0f172a",
-  "categories": ["productivity", "business", "utilities"],
-  "lang": "en-US",
-  "dir": "ltr",
+  "orientation": "portrait",
   "scope": "./",
+  "categories": ["productivity", "utilities"],
+  "dir": "ltr",
+  "lang": "en-US",
   "icons": [
     {
       "src": "icon-72.png",
@@ -62,39 +62,34 @@
       "purpose": "any maskable"
     }
   ],
-  "shortcuts": [
-    {
-      "name": "Add Task",
-      "short_name": "Add",
-      "description": "Add a new DevOps task",
-      "url": "./?add-task",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "View Critical",
-      "short_name": "Critical",
-      "description": "View critical tasks",
-      "url": "./?filter=critical",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
-    }
-  ],
   "screenshots": [
     {
-      "src": "./screenshot-mobile.png",
-      "sizes": "375x667",
+      "src": "screenshot-mobile.png",
+      "sizes": "360x640",
       "type": "image/png",
-      "form_factor": "narrow",
-      "label": "DevOps Dashboard on Mobile"
+      "form_factor": "narrow"
     },
     {
-      "src": "./screenshot-desktop.png",
+      "src": "screenshot-desktop.png",
       "sizes": "1280x720",
       "type": "image/png",
-      "form_factor": "wide",
-      "label": "DevOps Dashboard on Desktop"
+      "form_factor": "wide"
     }
   ],
-  "edge_side_panel": {
-    "preferred_width": 320
-  }
+  "shortcuts": [
+    {
+      "name": "Add New Task",
+      "short_name": "Add Task",
+      "description": "Quickly add a new DevOps task",
+      "url": "./?add=true",
+      "icons": [{ "src": "icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "View Pending",
+      "short_name": "Pending",
+      "description": "View pending tasks",
+      "url": "./?filter=pending",
+      "icons": [{ "src": "icon-96.png", "sizes": "96x96" }]
+    }
+  ]
 }

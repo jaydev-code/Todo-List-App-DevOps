@@ -2,72 +2,116 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>DevOps Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="icon-192.png" type="image/png">
+    <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
     <!-- Header -->
     <header class="header">
-        <button class="menu-btn" id="menuBtn">
-            <i class="fas fa-bars"></i>
-        </button>
-        <h1>DevOps</h1>
-        <button class="theme-btn" id="themeBtn">
-            <i class="fas fa-moon"></i>
-        </button>
+        <div class="header-left">
+            <button class="menu-btn" id="menuBtn" aria-label="Open menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <button class="refresh-btn" id="refreshBtn" aria-label="Refresh">
+                <i class="fas fa-redo"></i>
+            </button>
+        </div>
+        
+        <div class="header-center">
+            <h1>DevOps</h1>
+            <div class="status-indicator">
+                <span class="offline-status" id="offlineStatus">
+                    <i class="fas fa-wifi-slash"></i>
+                </span>
+            </div>
+        </div>
+        
+        <div class="header-right">
+            <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="filter-btn" id="filterBtn" aria-label="Filter tasks">
+                <i class="fas fa-filter"></i>
+            </button>
+        </div>
     </header>
 
     <!-- Main Content -->
     <main class="main">
         <!-- Stats -->
         <div class="stats">
-            <div class="stat">
+            <div class="stat" id="totalStat">
                 <i class="fas fa-tasks"></i>
                 <span id="totalTasks">0</span>
-                <small>Tasks</small>
+                <small>Total</small>
             </div>
-            <div class="stat">
+            <div class="stat" id="doneStat">
                 <i class="fas fa-check-circle"></i>
                 <span id="doneTasks">0</span>
                 <small>Done</small>
             </div>
-            <div class="stat">
-                <i class="fas fa-rocket"></i>
-                <span>12</span>
-                <small>Deploys</small>
+            <div class="stat" id="pendingStat">
+                <i class="fas fa-clock"></i>
+                <span id="pendingTasks">0</span>
+                <small>Pending</small>
             </div>
         </div>
 
         <!-- Add Task -->
         <div class="add-task">
-            <input type="text" id="taskInput" placeholder="Add DevOps task...">
-            <button id="addBtn">
+            <input type="text" id="taskInput" placeholder="Add DevOps task..." 
+                   aria-label="Task input" autocomplete="off">
+            <select id="prioritySelect" aria-label="Priority">
+                <option value="normal">Normal</option>
+                <option value="high">High</option>
+                <option value="critical">Critical</option>
+            </select>
+            <button id="addBtn" aria-label="Add task">
                 <i class="fas fa-plus"></i>
             </button>
         </div>
 
+        <!-- Quick Filters -->
+        <div class="quick-filters" id="quickFilters">
+            <button class="filter-tag active" data-filter="all">All</button>
+            <button class="filter-tag" data-filter="pending">Pending</button>
+            <button class="filter-tag" data-filter="completed">Done</button>
+            <button class="filter-tag" data-filter="critical">Critical</button>
+        </div>
+
         <!-- Task List -->
         <div class="task-list" id="taskList">
-            <!-- Tasks will appear here -->
+            <!-- Tasks injected here -->
         </div>
 
         <!-- Empty State -->
         <div class="empty" id="emptyState">
-            <i class="fas fa-check-circle"></i>
-            <p>No tasks found</p>
+            <i class="fas fa-tasks"></i>
+            <p>No DevOps tasks yet</p>
             <button class="sample-btn" id="addSamples">Add Sample Tasks</button>
+        </div>
+
+        <!-- Pull to Refresh -->
+        <div class="pull-to-refresh" id="pullToRefresh">
+            <i class="fas fa-arrow-down"></i>
+            <span>Pull to refresh</span>
         </div>
     </main>
 
     <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h2>Environments</h2>
-            <button class="close-btn" id="closeBtn">
+            <button class="close-btn" id="closeBtn" aria-label="Close menu">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -88,27 +132,66 @@
                 <span>Development</span>
                 <div class="status online"></div>
             </button>
+            <button class="env" data-env="test">
+                <i class="fas fa-vial"></i>
+                <span>Testing</span>
+                <div class="status idle"></div>
+            </button>
         </div>
 
         <div class="quick-actions">
             <h3>Quick Actions</h3>
             <button class="action-btn" id="deployBtn">
                 <i class="fas fa-rocket"></i>
-                Deploy
+                <span>Deploy Now</span>
             </button>
             <button class="action-btn" id="testBtn">
                 <i class="fas fa-vial"></i>
-                Run Tests
+                <span>Run Tests</span>
+            </button>
+            <button class="action-btn" id="backupBtn">
+                <i class="fas fa-save"></i>
+                <span>Backup Data</span>
+            </button>
+            <button class="action-btn" id="clearBtn">
+                <i class="fas fa-trash"></i>
+                <span>Clear Completed</span>
             </button>
         </div>
-    </div>
+
+        <div class="sidebar-footer">
+            <p class="version">v1.2.0</p>
+            <p class="last-sync" id="lastSync">Synced: Just now</p>
+        </div>
+    </aside>
 
     <!-- Overlay -->
     <div class="overlay" id="overlay"></div>
 
     <!-- Toast -->
-    <div id="toast"></div>
+    <div id="toast" role="alert" aria-live="polite"></div>
 
-    <script src="apps.js"></script>
+    <!-- Service Worker Registration -->
+    <script>
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registered:', reg))
+                    .catch(err => console.log('Service Worker registration failed:', err));
+            });
+        }
+
+        // Offline detection
+        window.addEventListener('online', () => {
+            document.getElementById('offlineStatus').classList.remove('visible');
+        });
+        
+        window.addEventListener('offline', () => {
+            document.getElementById('offlineStatus').classList.add('visible');
+        });
+    </script>
+    
+    <script src="app.js"></script>
 </body>
 </html>
