@@ -1,100 +1,51 @@
 {
   "name": "DevOps Dashboard",
   "short_name": "DevOps",
-  "description": "Mobile-first DevOps task manager with offline support",
+  "description": "Modern DevOps task manager",
   "start_url": "./",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone"],
-  "orientation": "portrait",
-  "theme_color": "#2563eb",
+  "theme_color": "#6366f1",
   "background_color": "#0f172a",
-  "categories": ["productivity", "business", "utilities"],
-  "lang": "en-US",
-  "dir": "ltr",
-  "scope": "./",
   "icons": [
     {
       "src": "icon-72.png",
       "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
       "src": "icon-96.png",
       "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
       "src": "icon-128.png",
       "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
       "src": "icon-144.png",
       "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
       "src": "icon-152.png",
       "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
       "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
       "src": "icon-384.png",
       "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
-  ],
-  "shortcuts": [
-    {
-      "name": "Add Task",
-      "short_name": "Add",
-      "description": "Add a new DevOps task",
-      "url": "./?add-task",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "View Critical",
-      "short_name": "Critical",
-      "description": "View critical tasks",
-      "url": "./?filter=critical",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "./screenshot-mobile.png",
-      "sizes": "375x667",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "DevOps Dashboard on Mobile"
-    },
-    {
-      "src": "./screenshot-desktop.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "DevOps Dashboard on Desktop"
-    }
-  ],
-  "edge_side_panel": {
-    "preferred_width": 320
-  }
+  ]
 }

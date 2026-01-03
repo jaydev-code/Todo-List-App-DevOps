@@ -1,197 +1,308 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#2563eb">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <meta name="theme-color" content="#6366f1">
     <title>DevOps Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+    
+    <!-- Use YOUR existing files -->
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="icon-192.png" type="image/png">
     <link rel="apple-touch-icon" href="icon-192.png">
-</head>
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-left">
-            <button class="menu-btn" id="menuBtn" aria-label="Open menu">
-                <i class="fas fa-bars"></i>
-            </button>
-            <button class="refresh-btn" id="refreshBtn" aria-label="Refresh">
-                <i class="fas fa-redo"></i>
-            </button>
-        </div>
-        
-        <div class="header-center">
-            <h1>DevOps</h1>
-            <div class="status-indicator">
-                <span class="offline-status" id="offlineStatus">
-                    <i class="fas fa-wifi-slash"></i>
-                </span>
-            </div>
-        </div>
-        
-        <div class="header-right">
-            <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">
-                <i class="fas fa-moon"></i>
-            </button>
-            <button class="filter-btn" id="filterBtn" aria-label="Filter tasks">
-                <i class="fas fa-filter"></i>
-            </button>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="main">
-        <!-- Stats -->
-        <div class="stats">
-            <div class="stat" id="totalStat">
-                <i class="fas fa-tasks"></i>
-                <span id="totalTasks">0</span>
-                <small>Total</small>
-            </div>
-            <div class="stat" id="doneStat">
-                <i class="fas fa-check-circle"></i>
-                <span id="doneTasks">0</span>
-                <small>Done</small>
-            </div>
-            <div class="stat" id="pendingStat">
-                <i class="fas fa-clock"></i>
-                <span id="pendingTasks">0</span>
-                <small>Pending</small>
-            </div>
-        </div>
-
-        <!-- Add Task -->
-        <div class="add-task">
-            <input type="text" id="taskInput" placeholder="Add DevOps task..." 
-                   aria-label="Task input" autocomplete="off">
-            <select id="prioritySelect" aria-label="Priority">
-                <option value="normal">Normal</option>
-                <option value="high">High</option>
-                <option value="critical">Critical</option>
-            </select>
-            <button id="addBtn" aria-label="Add task">
-                <i class="fas fa-plus"></i>
-            </button>
-        </div>
-
-        <!-- Quick Filters -->
-        <div class="quick-filters" id="quickFilters">
-            <button class="filter-tag active" data-filter="all">All</button>
-            <button class="filter-tag" data-filter="pending">Pending</button>
-            <button class="filter-tag" data-filter="completed">Done</button>
-            <button class="filter-tag" data-filter="critical">Critical</button>
-        </div>
-
-        <!-- Task List -->
-        <div class="task-list" id="taskList">
-            <!-- Tasks injected here -->
-        </div>
-
-        <!-- Empty State -->
-        <div class="empty" id="emptyState">
-            <i class="fas fa-tasks"></i>
-            <p>No DevOps tasks yet</p>
-            <button class="sample-btn" id="addSamples">Add Sample Tasks</button>
-        </div>
-
-        <!-- Pull to Refresh -->
-        <div class="pull-to-refresh" id="pullToRefresh">
-            <i class="fas fa-arrow-down"></i>
-            <span>Pull to refresh</span>
-        </div>
-    </main>
-
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h2>Environments</h2>
-            <button class="close-btn" id="closeBtn" aria-label="Close menu">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        
-        <div class="envs">
-            <button class="env active" data-env="prod">
-                <i class="fas fa-server"></i>
-                <span>Production</span>
-                <div class="status online"></div>
-            </button>
-            <button class="env" data-env="stage">
-                <i class="fas fa-flask"></i>
-                <span>Staging</span>
-                <div class="status warning"></div>
-            </button>
-            <button class="env" data-env="dev">
-                <i class="fas fa-code"></i>
-                <span>Development</span>
-                <div class="status online"></div>
-            </button>
-            <button class="env" data-env="test">
-                <i class="fas fa-vial"></i>
-                <span>Testing</span>
-                <div class="status idle"></div>
-            </button>
-        </div>
-
-        <div class="quick-actions">
-            <h3>Quick Actions</h3>
-            <button class="action-btn" id="deployBtn">
-                <i class="fas fa-rocket"></i>
-                <span>Deploy Now</span>
-            </button>
-            <button class="action-btn" id="testBtn">
-                <i class="fas fa-vial"></i>
-                <span>Run Tests</span>
-            </button>
-            <button class="action-btn" id="backupBtn">
-                <i class="fas fa-save"></i>
-                <span>Backup Data</span>
-            </button>
-            <button class="action-btn" id="clearBtn">
-                <i class="fas fa-trash"></i>
-                <span>Clear Completed</span>
-            </button>
-        </div>
-
-        <div class="sidebar-footer">
-            <p class="version">v1.2.0</p>
-            <p class="last-sync" id="lastSync">Synced: Just now</p>
-        </div>
-    </aside>
-
-    <!-- Overlay -->
-    <div class="overlay" id="overlay"></div>
-
-    <!-- Toast -->
-    <div id="toast" role="alert" aria-live="polite"></div>
-
-    <!-- Service Worker Registration -->
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Your CSS file -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- PWA Registration -->
     <script>
-        // Register service worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service Worker registered:', reg))
-                    .catch(err => console.log('Service Worker registration failed:', err));
+                    .then(reg => console.log('✅ Service Worker registered'))
+                    .catch(err => console.log('❌ Service Worker failed:', err));
             });
         }
-
-        // Offline detection
-        window.addEventListener('online', () => {
-            document.getElementById('offlineStatus').classList.remove('visible');
-        });
-        
-        window.addEventListener('offline', () => {
-            document.getElementById('offlineStatus').classList.add('visible');
-        });
     </script>
-    
-    <script src="app.js"></script>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader">
+            <div class="loader-spinner"></div>
+            <p>Initializing DevOps Dashboard...</p>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="app-container">
+        <!-- Top Navigation -->
+        <nav class="top-nav">
+            <div class="nav-left">
+                <button class="nav-btn menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="app-logo">
+                    <i class="fas fa-rocket"></i>
+                    <span>DevOps</span>
+                </div>
+            </div>
+            
+            <div class="nav-center">
+                <div class="env-badge" id="currentEnv">
+                    <i class="fas fa-server"></i>
+                    <span>Production</span>
+                </div>
+            </div>
+            
+            <div class="nav-right">
+                <button class="nav-btn theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="nav-btn notification-btn" id="notificationsBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalTasks">0</h3>
+                        <p>Total Tasks</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="completedTasks">0</h3>
+                        <p>Completed</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="pendingTasks">0</h3>
+                        <p>Pending</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="criticalTasks">0</h3>
+                        <p>Critical</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="section">
+                <h2>Quick Actions</h2>
+                <div class="actions-grid">
+                    <button class="action-btn" data-action="deploy">
+                        <i class="fas fa-rocket"></i>
+                        <span>Deploy</span>
+                    </button>
+                    
+                    <button class="action-btn" data-action="monitor">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Monitor</span>
+                    </button>
+                    
+                    <button class="action-btn" data-action="backup">
+                        <i class="fas fa-database"></i>
+                        <span>Backup</span>
+                    </button>
+                    
+                    <button class="action-btn" data-action="test">
+                        <i class="fas fa-vial"></i>
+                        <span>Test</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Task Management -->
+            <div class="section task-section">
+                <div class="section-header">
+                    <h2>DevOps Tasks</h2>
+                    <button class="btn-primary" id="addTaskBtn">
+                        <i class="fas fa-plus"></i> Add Task
+                    </button>
+                </div>
+                
+                <!-- Add Task Form -->
+                <div class="add-task-form" id="addTaskForm">
+                    <div class="form-header">
+                        <h3>Add New Task</h3>
+                        <button class="close-form" id="closeFormBtn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="form-body">
+                        <div class="form-group">
+                            <input type="text" id="taskTitle" placeholder="Task title...">
+                        </div>
+                        <div class="form-group">
+                            <textarea id="taskDescription" placeholder="Description..."></textarea>
+                        </div>
+                        <div class="form-row">
+                            <select id="taskPriority">
+                                <option value="low">Low</option>
+                                <option value="normal" selected>Normal</option>
+                                <option value="high">High</option>
+                                <option value="critical">Critical</option>
+                            </select>
+                            <select id="taskEnvironment">
+                                <option value="production">Production</option>
+                                <option value="staging">Staging</option>
+                                <option value="development">Development</option>
+                            </select>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn-secondary" id="cancelTaskBtn">Cancel</button>
+                            <button class="btn-primary" id="saveTaskBtn">Save Task</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Task List -->
+                <div class="task-list" id="taskList">
+                    <!-- Tasks will be added here -->
+                </div>
+                
+                <!-- Empty State -->
+                <div class="empty-state" id="emptyState">
+                    <i class="fas fa-tasks"></i>
+                    <h3>No tasks yet</h3>
+                    <p>Add your first DevOps task to get started</p>
+                    <button class="btn-primary" id="createFirstTask">
+                        <i class="fas fa-plus"></i> Create First Task
+                    </button>
+                </div>
+                
+                <!-- Filter Tabs -->
+                <div class="filter-tabs">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="pending">Pending</button>
+                    <button class="filter-btn" data-filter="completed">Completed</button>
+                    <button class="filter-btn" data-filter="critical">Critical</button>
+                </div>
+            </div>
+
+            <!-- Recent Deployments -->
+            <div class="section">
+                <h2>Recent Deployments</h2>
+                <div class="deployments-list">
+                    <div class="deployment-item success">
+                        <div class="deployment-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="deployment-info">
+                            <h4>API Gateway v2.1.0</h4>
+                            <p>Production • 2 hours ago</p>
+                        </div>
+                        <span class="status-badge success">Success</span>
+                    </div>
+                    
+                    <div class="deployment-item running">
+                        <div class="deployment-icon">
+                            <i class="fas fa-sync fa-spin"></i>
+                        </div>
+                        <div class="deployment-info">
+                            <h4>Frontend Dashboard</h4>
+                            <p>Staging • In progress</p>
+                        </div>
+                        <span class="status-badge running">Running</span>
+                    </div>
+                    
+                    <div class="deployment-item warning">
+                        <div class="deployment-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="deployment-info">
+                            <h4>Database Migration</h4>
+                            <p>Development • 1 day ago</p>
+                        </div>
+                        <span class="status-badge warning">Warning</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>Environments</h2>
+                <button class="close-sidebar" id="closeSidebar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="environments-list">
+                <div class="env-item active" data-env="production">
+                    <i class="fas fa-server"></i>
+                    <div class="env-info">
+                        <h4>Production</h4>
+                        <p>3 services running</p>
+                    </div>
+                    <div class="status-dot online"></div>
+                </div>
+                
+                <div class="env-item" data-env="staging">
+                    <i class="fas fa-flask"></i>
+                    <div class="env-info">
+                        <h4>Staging</h4>
+                        <p>1 deployment pending</p>
+                    </div>
+                    <div class="status-dot warning"></div>
+                </div>
+                
+                <div class="env-item" data-env="development">
+                    <i class="fas fa-code"></i>
+                    <div class="env-info">
+                        <h4>Development</h4>
+                        <p>5 active branches</p>
+                    </div>
+                    <div class="status-dot online"></div>
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <div class="connection-status">
+                    <div class="status-dot online"></div>
+                    <span>Connected</span>
+                </div>
+                <div class="app-version">v2.0.0</div>
+            </div>
+        </aside>
+
+        <!-- Overlay -->
+        <div class="overlay" id="overlay"></div>
+
+        <!-- Toast Container -->
+        <div class="toast-container" id="toastContainer"></div>
+    </div>
+
+    <!-- Your JavaScript file -->
+    <script src="apps.js"></script>
 </body>
 </html>

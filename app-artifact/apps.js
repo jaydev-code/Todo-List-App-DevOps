@@ -1,224 +1,228 @@
-// DevOps Dashboard PWA - Main Application
 class DevOpsDashboard {
     constructor() {
         this.tasks = JSON.parse(localStorage.getItem('devops-tasks')) || [];
         this.currentFilter = 'all';
-        this.currentEnv = 'prod';
-        this.theme = localStorage.getItem('theme') || 'light';
+        this.currentEnv = 'production';
+        this.theme = localStorage.getItem('theme') || 'dark';
         this.isSidebarOpen = false;
         
         this.init();
     }
 
     init() {
-        console.log('🚀 Initializing DevOps Dashboard...');
+        console.log('🚀 DevOps Dashboard v2.0');
         
-        // Apply initial theme
-        this.applyTheme(this.theme);
+        // Apply theme
+        document.documentElement.setAttribute('data-theme', this.theme);
+        this.updateThemeIcon();
         
-        // Bind all events
+        // Hide loading screen
+        setTimeout(() => {
+            document.getElementById('loadingScreen').classList.add('loaded');
+        }, 800);
+        
+        // Bind events
         this.bindEvents();
         
         // Initial render
         this.renderTasks();
         this.updateStats();
         
-        // Check online status
-        this.updateOnlineStatus();
-        
-        console.log('✅ DevOps Dashboard ready!');
+        // Add sample tasks if empty
+        if (this.tasks.length === 0) {
+            setTimeout(() => this.addSampleTasks(), 1000);
+        }
     }
 
     bindEvents() {
         // Theme toggle
-        document.getElementById('themeBtn').addEventListener('click', () => this.toggleTheme());
+        document.getElementById('themeToggle').addEventListener('click', () => this.toggleTheme());
         
         // Menu toggle
-        document.getElementById('menuBtn').addEventListener('click', () => this.toggleSidebar());
-        document.getElementById('closeBtn').addEventListener('click', () => this.toggleSidebar());
+        document.getElementById('menuToggle').addEventListener('click', () => this.toggleSidebar());
+        document.getElementById('closeSidebar').addEventListener('click', () => this.toggleSidebar());
         document.getElementById('overlay').addEventListener('click', () => this.toggleSidebar());
         
-        // Add task
-        document.getElementById('addBtn').addEventListener('click', () => this.addTask());
-        document.getElementById('taskInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.addTask();
-        });
+        // Task management
+        document.getElementById('addTaskBtn').addEventListener('click', () => this.showAddTaskForm());
+        document.getElementById('createFirstTask').addEventListener('click', () => this.showAddTaskForm());
+        document.getElementById('closeFormBtn').addEventListener('click', () => this.hideAddTaskForm());
+        document.getElementById('cancelTaskBtn').addEventListener('click', () => this.hideAddTaskForm());
+        document.getElementById('saveTaskBtn').addEventListener('click', () => this.saveTask());
         
-        // Quick filters
-        document.querySelectorAll('.filter-tag').forEach(btn => {
+        // Task filters
+        document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', (e) => this.setFilter(e.currentTarget.dataset.filter));
         });
         
-        // Environment selection
-        document.querySelectorAll('.env').forEach(env => {
-            env.addEventListener('click', (e) => this.selectEnvironment(e.currentTarget));
-        });
-        
         // Quick actions
-        document.getElementById('deployBtn').addEventListener('click', () => this.deploy());
-        document.getElementById('testBtn').addEventListener('click', () => this.runTests());
-        document.getElementById('backupBtn').addEventListener('click', () => this.backupData());
-        document.getElementById('clearBtn').addEventListener('click', () => this.clearCompleted());
-        
-        // Sample tasks
-        document.getElementById('addSamples').addEventListener('click', () => this.addSampleTasks());
-        
-        // Refresh button
-        document.getElementById('refreshBtn').addEventListener('click', () => this.refresh());
-        
-        // Online/offline events
-        window.addEventListener('online', () => this.updateOnlineStatus());
-        window.addEventListener('offline', () => this.updateOnlineStatus());
-        
-        // Touch events for mobile
-        this.bindTouchEvents();
-    }
-
-    bindTouchEvents() {
-        let touchStartY = 0;
-        let touchEndY = 0;
-        
-        document.addEventListener('touchstart', (e) => {
-            touchStartY = e.touches[0].clientY;
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => this.handleQuickAction(e.currentTarget.dataset.action));
         });
         
-        document.addEventListener('touchend', (e) => {
-            touchEndY = e.changedTouches[0].clientY;
-            const diff = touchStartY - touchEndY;
-            
-            // Pull to refresh (pull down)
-            if (diff < -100 && window.scrollY === 0) {
-                this.refresh();
-            }
+        // Environment selection
+        document.querySelectorAll('.env-item').forEach(item => {
+            item.addEventListener('click', (e) => this.selectEnvironment(e.currentTarget.dataset.env));
         });
+        
+        // Environment badge click
+        document.getElementById('currentEnv').addEventListener('click', () => this.toggleSidebar());
     }
 
-    // Theme Functions
-    applyTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        this.updateThemeIcon();
-    }
-
+    // Theme Management
     toggleTheme() {
         this.theme = this.theme === 'light' ? 'dark' : 'light';
         localStorage.setItem('theme', this.theme);
-        this.applyTheme(this.theme);
-        this.showToast(`Switched to ${this.theme} mode`);
+        document.documentElement.setAttribute('data-theme', this.theme);
+        this.updateThemeIcon();
+        this.showToast('Theme changed', 'success');
     }
 
     updateThemeIcon() {
-        const icon = document.querySelector('#themeBtn i');
+        const icon = document.querySelector('#themeToggle i');
         icon.className = this.theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
     }
 
-    // Sidebar Functions
+    // Sidebar
     toggleSidebar() {
         this.isSidebarOpen = !this.isSidebarOpen;
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
         
         if (this.isSidebarOpen) {
-            sidebar.classList.add('active');
-            overlay.classList.add('active');
+            sidebar.classList.add('show');
+            overlay.classList.add('show');
             document.body.style.overflow = 'hidden';
         } else {
-            sidebar.classList.remove('active');
-            overlay.classList.remove('active');
+            sidebar.classList.remove('show');
+            overlay.classList.remove('show');
             document.body.style.overflow = '';
         }
     }
 
-    selectEnvironment(envElement) {
-        document.querySelectorAll('.env').forEach(e => e.classList.remove('active'));
-        envElement.classList.add('active');
-        this.currentEnv = envElement.dataset.env;
-        this.showToast(`Selected ${envElement.querySelector('span').textContent}`);
+    // Environment Management
+    selectEnvironment(env) {
+        this.currentEnv = env;
+        
+        // Update active environment
+        document.querySelectorAll('.env-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        document.querySelector(`.env-item[data-env="${env}"]`).classList.add('active');
+        
+        // Update badge
+        this.updateEnvironmentBadge();
+        
+        this.showToast(`Switched to ${env}`, 'success');
+        
+        // Close sidebar on mobile
+        if (window.innerWidth < 768) {
+            this.toggleSidebar();
+        }
     }
 
-    // Task Functions
-    addTask() {
-        const input = document.getElementById('taskInput');
-        const text = input.value.trim();
-        const priority = document.getElementById('prioritySelect').value;
+    updateEnvironmentBadge() {
+        const badge = document.getElementById('currentEnv');
+        const icons = {
+            'production': 'fa-server',
+            'staging': 'fa-flask',
+            'development': 'fa-code'
+        };
         
-        if (!text) {
-            this.showToast('Please enter a task', 'warning');
-            input.focus();
+        badge.querySelector('i').className = `fas ${icons[this.currentEnv]}`;
+        badge.querySelector('span').textContent = this.currentEnv.charAt(0).toUpperCase() + this.currentEnv.slice(1);
+    }
+
+    // Task Management
+    showAddTaskForm() {
+        document.getElementById('addTaskForm').classList.add('show');
+        document.getElementById('taskTitle').focus();
+        document.getElementById('emptyState').classList.remove('show');
+    }
+
+    hideAddTaskForm() {
+        document.getElementById('addTaskForm').classList.remove('show');
+        document.getElementById('taskTitle').value = '';
+        document.getElementById('taskDescription').value = '';
+        document.getElementById('taskPriority').value = 'normal';
+        document.getElementById('taskEnvironment').value = this.currentEnv;
+    }
+
+    saveTask() {
+        const title = document.getElementById('taskTitle').value.trim();
+        const description = document.getElementById('taskDescription').value.trim();
+        const priority = document.getElementById('taskPriority').value;
+        const environment = document.getElementById('taskEnvironment').value;
+        
+        if (!title) {
+            this.showToast('Please enter task title', 'error');
             return;
         }
-
+        
         const task = {
-            id: Date.now(),
-            text,
+            id: Date.now().toString(),
+            title,
+            description,
             priority,
-            env: this.currentEnv,
+            environment,
             completed: false,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
         };
-
+        
         this.tasks.unshift(task);
-        this.save();
+        this.saveTasks();
         this.renderTasks();
+        this.hideAddTaskForm();
         
-        input.value = '';
-        input.focus();
-        
-        this.showToast('Task added successfully');
+        this.showToast('Task added successfully', 'success');
     }
 
-    addSampleTasks() {
-        const samples = [
-            { text: 'Deploy v3.2.0 to production', priority: 'high' },
-            { text: 'Fix API authentication bug', priority: 'critical' },
-            { text: 'Update monitoring dashboard', priority: 'normal' },
-            { text: 'Run security scan on staging', priority: 'high' },
-            { text: 'Optimize database queries', priority: 'normal' },
-            { text: 'Update documentation', priority: 'normal' },
-            { text: 'Backup production database', priority: 'high' },
-            { text: 'Setup CI/CD pipeline for new service', priority: 'critical' }
-        ];
-
-        samples.forEach(sample => {
-            this.tasks.unshift({
-                id: Date.now() + Math.random(),
-                text: sample.text,
-                priority: sample.priority,
-                env: this.currentEnv,
-                completed: false,
-                createdAt: new Date().toISOString()
-            });
-        });
-
-        this.save();
-        this.renderTasks();
-        this.showToast('Sample tasks added');
-    }
-
-    toggleTask(id) {
-        const task = this.tasks.find(t => t.id === id);
+    toggleTask(taskId) {
+        const task = this.tasks.find(t => t.id === taskId);
         if (task) {
             task.completed = !task.completed;
-            task.completedAt = task.completed ? new Date().toISOString() : null;
-            this.save();
+            task.updatedAt = new Date().toISOString();
+            this.saveTasks();
             this.renderTasks();
-            this.showToast(task.completed ? 'Task completed' : 'Task reopened');
+            this.updateStats();
+            
+            this.showToast(
+                task.completed ? 'Task completed' : 'Task reopened',
+                task.completed ? 'success' : 'warning'
+            );
         }
     }
 
-    deleteTask(id, event) {
-        if (event) event.stopPropagation();
-        this.tasks = this.tasks.filter(t => t.id !== id);
-        this.save();
-        this.renderTasks();
-        this.showToast('Task deleted', 'warning');
+    deleteTask(taskId) {
+        if (confirm('Delete this task?')) {
+            this.tasks = this.tasks.filter(t => t.id !== taskId);
+            this.saveTasks();
+            this.renderTasks();
+            this.updateStats();
+            this.showToast('Task deleted', 'error');
+        }
     }
 
-    // Filter Functions
+    editTask(taskId) {
+        const task = this.tasks.find(t => t.id === taskId);
+        if (task) {
+            document.getElementById('taskTitle').value = task.title;
+            document.getElementById('taskDescription').value = task.description;
+            document.getElementById('taskPriority').value = task.priority;
+            document.getElementById('taskEnvironment').value = task.environment;
+            
+            this.showAddTaskForm();
+            
+            this.tasks = this.tasks.filter(t => t.id !== taskId);
+        }
+    }
+
+    // Task Filtering
     setFilter(filter) {
         this.currentFilter = filter;
         
-        // Update active filter button
-        document.querySelectorAll('.filter-tag').forEach(btn => {
+        document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.filter === filter);
         });
         
@@ -238,176 +242,192 @@ class DevOpsDashboard {
         }
     }
 
-    // Render Functions
+    // Rendering
     renderTasks() {
         const container = document.getElementById('taskList');
         const emptyState = document.getElementById('emptyState');
         const filteredTasks = this.getFilteredTasks();
-
+        
         if (filteredTasks.length === 0) {
             container.innerHTML = '';
-            emptyState.classList.add('visible');
+            emptyState.classList.add('show');
             return;
         }
-
-        emptyState.classList.remove('visible');
+        
+        emptyState.classList.remove('show');
         
         container.innerHTML = filteredTasks.map(task => this.createTaskHTML(task)).join('');
         
-        // Add event listeners to new task elements
+        // Add event listeners
         container.querySelectorAll('.task-checkbox').forEach(checkbox => {
-            const taskId = parseInt(checkbox.closest('.task').dataset.id);
-            checkbox.addEventListener('click', () => this.toggleTask(taskId));
+            const taskId = checkbox.closest('.task-item').dataset.id;
+            checkbox.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleTask(taskId);
+            });
         });
         
-        this.updateStats();
+        container.querySelectorAll('.task-action-btn.edit').forEach(btn => {
+            const taskId = btn.closest('.task-item').dataset.id;
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.editTask(taskId);
+            });
+        });
+        
+        container.querySelectorAll('.task-action-btn.delete').forEach(btn => {
+            const taskId = btn.closest('.task-item').dataset.id;
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.deleteTask(taskId);
+            });
+        });
     }
 
     createTaskHTML(task) {
-        const priorityIcon = task.priority === 'critical' ? 'exclamation-triangle' :
-                           task.priority === 'high' ? 'exclamation' : 'circle';
-        
         return `
-            <div class="task ${task.priority} ${task.completed ? 'completed-item' : ''}" data-id="${task.id}">
+            <div class="task-item" data-id="${task.id}">
                 <div class="task-checkbox ${task.completed ? 'checked' : ''}">
                     ${task.completed ? '<i class="fas fa-check"></i>' : ''}
                 </div>
                 <div class="task-content">
-                    <div class="task-text ${task.completed ? 'completed' : ''}">${this.escapeHTML(task.text)}</div>
+                    <div class="task-title ${task.completed ? 'completed' : ''}">
+                        ${this.escapeHTML(task.title)}
+                    </div>
+                    ${task.description ? `<p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.3rem;">${this.escapeHTML(task.description)}</p>` : ''}
                     <div class="task-meta">
-                        <span class="priority ${task.priority}">
-                            <i class="fas fa-${priorityIcon}"></i>
-                            ${task.priority.toUpperCase()}
-                        </span>
-                        <span class="task-date">
-                            ${this.formatDate(task.createdAt)}
-                        </span>
+                        <span class="priority-badge ${task.priority}">${task.priority}</span>
+                        <span>${task.environment}</span>
+                        <span>${this.getTimeAgo(task.createdAt)}</span>
                     </div>
                 </div>
-                <button class="delete-btn" onclick="dashboard.deleteTask(${task.id}, event)" aria-label="Delete task">
-                    <i class="fas fa-trash"></i>
-                </button>
+                <div class="task-actions">
+                    <button class="task-action-btn edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="task-action-btn delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
             </div>
         `;
     }
 
+    // Stats
     updateStats() {
         const total = this.tasks.length;
-        const done = this.tasks.filter(t => t.completed).length;
-        const pending = total - done;
-
+        const completed = this.tasks.filter(t => t.completed).length;
+        const pending = total - completed;
+        const critical = this.tasks.filter(t => t.priority === 'critical').length;
+        
         document.getElementById('totalTasks').textContent = total;
-        document.getElementById('doneTasks').textContent = done;
+        document.getElementById('completedTasks').textContent = completed;
         document.getElementById('pendingTasks').textContent = pending;
+        document.getElementById('criticalTasks').textContent = critical;
     }
 
     // Quick Actions
-    deploy() {
-        this.showToast('Deployment started...', 'info');
-        setTimeout(() => this.showToast('Deployment successful!'), 2000);
-    }
-
-    runTests() {
-        this.showToast('Running tests...', 'info');
-        setTimeout(() => this.showToast('All tests passed!'), 1500);
-    }
-
-    backupData() {
-        this.showToast('Creating backup...', 'info');
-        setTimeout(() => this.showToast('Backup completed successfully'), 2500);
-    }
-
-    clearCompleted() {
-        const completedCount = this.tasks.filter(t => t.completed).length;
-        if (completedCount === 0) {
-            this.showToast('No completed tasks to clear', 'warning');
-            return;
-        }
-
-        this.tasks = this.tasks.filter(t => !t.completed);
-        this.save();
-        this.renderTasks();
-        this.showToast(`Cleared ${completedCount} completed tasks`, 'success');
-    }
-
-    refresh() {
-        const refreshBtn = document.getElementById('refreshBtn');
-        refreshBtn.classList.add('rotating');
+    handleQuickAction(action) {
+        const messages = {
+            deploy: 'Starting deployment...',
+            monitor: 'Opening monitoring...',
+            backup: 'Starting backup...',
+            test: 'Running tests...'
+        };
         
-        setTimeout(() => {
-            refreshBtn.classList.remove('rotating');
-            this.updateStats();
-            this.updateSyncTime();
-            this.showToast('Dashboard refreshed');
-        }, 800);
+        this.showToast(messages[action], 'success');
+        
+        // Simulate action
+        const btn = document.querySelector(`.action-btn[data-action="${action}"]`);
+        btn.disabled = true;
+        setTimeout(() => btn.disabled = false, 2000);
+    }
+
+    // Sample Data
+    addSampleTasks() {
+        const samples = [
+            {
+                id: '1',
+                title: 'Deploy API Gateway v2.1.0',
+                description: 'Deploy new version with rate limiting',
+                priority: 'critical',
+                environment: 'production',
+                completed: true,
+                createdAt: new Date(Date.now() - 7200000).toISOString()
+            },
+            {
+                id: '2',
+                title: 'Database Migration',
+                description: 'Update database schema',
+                priority: 'high',
+                environment: 'staging',
+                completed: false,
+                createdAt: new Date(Date.now() - 86400000).toISOString()
+            },
+            {
+                id: '3',
+                title: 'Security Audit',
+                description: 'Complete security assessment',
+                priority: 'high',
+                environment: 'production',
+                completed: false,
+                createdAt: new Date(Date.now() - 172800000).toISOString()
+            },
+            {
+                id: '4',
+                title: 'Frontend Optimization',
+                description: 'Improve loading performance',
+                priority: 'normal',
+                environment: 'development',
+                completed: false,
+                createdAt: new Date(Date.now() - 259200000).toISOString()
+            }
+        ];
+        
+        this.tasks = [...samples, ...this.tasks];
+        this.saveTasks();
+        this.renderTasks();
+        this.updateStats();
+        
+        this.showToast('Sample tasks added', 'success');
     }
 
     // Utility Functions
-    save() {
+    saveTasks() {
         localStorage.setItem('devops-tasks', JSON.stringify(this.tasks));
-        this.updateSyncTime();
-    }
-
-    updateSyncTime() {
-        const syncElement = document.getElementById('lastSync');
-        if (syncElement) {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            syncElement.textContent = `Synced: ${timeString}`;
-        }
-    }
-
-    updateOnlineStatus() {
-        const offlineStatus = document.getElementById('offlineStatus');
-        if (navigator.onLine) {
-            offlineStatus.classList.remove('visible');
-        } else {
-            offlineStatus.classList.add('visible');
-        }
     }
 
     showToast(message, type = 'success') {
-        const toast = document.getElementById('toast');
-        if (!toast) return;
-
-        // Set color based on type
-        let color = '#10b981'; // success green
-        if (type === 'warning') color = '#f59e0b';
-        if (type === 'error') color = '#ef4444';
-        if (type === 'info') color = '#3b82f6';
-
-        toast.style.borderLeft = `4px solid ${color}`;
-        toast.textContent = message;
-        toast.classList.add('show');
-
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-times-circle'}"></i>
+                <div>${message}</div>
+            </div>
+        `;
+        
+        container.appendChild(toast);
+        
         setTimeout(() => {
-            toast.classList.remove('show');
+            toast.remove();
         }, 3000);
     }
 
-    formatDate(isoString) {
-        const date = new Date(isoString);
+    getTimeAgo(timestamp) {
         const now = new Date();
-        const diff = now - date;
+        const past = new Date(timestamp);
+        const diff = now - past;
         
-        // Less than 1 minute
-        if (diff < 60000) return 'Just now';
+        const minutes = Math.floor(diff / 60000);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
         
-        // Less than 1 hour
-        if (diff < 3600000) {
-            const minutes = Math.floor(diff / 60000);
-            return `${minutes}m ago`;
-        }
-        
-        // Less than 1 day
-        if (diff < 86400000) {
-            const hours = Math.floor(diff / 3600000);
-            return `${hours}h ago`;
-        }
-        
-        // More than 1 day
-        const days = Math.floor(diff / 86400000);
-        return days === 1 ? 'Yesterday' : `${days}d ago`;
+        if (days > 0) return `${days}d ago`;
+        if (hours > 0) return `${hours}h ago`;
+        if (minutes > 0) return `${minutes}m ago`;
+        return 'Just now';
     }
 
     escapeHTML(text) {
@@ -417,7 +437,7 @@ class DevOpsDashboard {
     }
 }
 
-// Initialize dashboard when DOM is ready
+// Initialize
 document.addEventListener('DOMContentLoaded', () => {
     window.dashboard = new DevOpsDashboard();
 });
