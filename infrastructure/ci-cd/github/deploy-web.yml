@@ -11,13 +11,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name : check index.html
-        uses: test -f app-artifact/index.html
+      - name: Check index.html exists
+        run: test -f app-artifact/index.html
 
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v2.0
         with:
-          publish-dir: './artifact'
+          publish-dir: './app-artifact'       # <- fixed folder
           production-deploy: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
           deploy-message: "Deploy from GitHub Actions"
