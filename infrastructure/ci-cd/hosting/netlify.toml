@@ -1,5 +1,5 @@
 [build]
 base = "/"
-publish = "does-not-exist"
+publish = "app-artifact"
 command = ""
 
