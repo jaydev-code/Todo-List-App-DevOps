@@ -441,3 +441,11 @@ class DevOpsDashboard {
 document.addEventListener('DOMContentLoaded', () => {
     window.dashboard = new DevOpsDashboard();
 });
+
+console.log("App Environment:", import.meta.env.VITE_APP_ENV);
+
+if (import.meta.env.VITE_APP_ENV === "production") {
+  console.log("🚀 Running in PRODUCTION mode");
+} else {
+  console.log("🛠️ Running in DEVELOPMENT mode");
+}
