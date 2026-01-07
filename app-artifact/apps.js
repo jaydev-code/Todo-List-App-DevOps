@@ -1,12 +1,17 @@
-// Safe environment variable access
-const env = import.meta.env?.VITE_APP_ENV || 'development';
-console.log('App Environment:', env);
 
-if (env === 'production') {
-    console.log('Running in PRODUCTION mode');
+const ENV =
+  location.hostname.includes("netlify.app")
+    ? "production"
+    : "development";
+
+console.log("App Environment:", ENV);
+
+if (ENV === "production") {
+  console.log("🚀 Running in PRODUCTION mode");
 } else {
-    console.log('Running in DEVELOPMENT mode');
+  console.log("🛠️ Running in DEVELOPMENT mode");
 }
+
 
 // Initialize dashboard safely
 document.addEventListener('DOMContentLoaded', () => {
