@@ -1,3 +1,22 @@
+// Safe environment variable access
+const env = import.meta.env?.VITE_APP_ENV || 'development';
+console.log('App Environment:', env);
+
+if (env === 'production') {
+    console.log('Running in PRODUCTION mode');
+} else {
+    console.log('Running in DEVELOPMENT mode');
+}
+
+// Initialize dashboard safely
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        window.dashboard = new DevOpsDashboard();
+    } catch (e) {
+        console.error('Dashboard failed to initialize:', e);
+    }
+});
+
 class DevOpsDashboard {
     constructor() {
         this.tasks = JSON.parse(localStorage.getItem('devops-tasks')) || [];
@@ -437,16 +456,9 @@ class DevOpsDashboard {
     }
 }
 
-console.log("App Environment:", import.meta.env.VITE_APP_ENV);
-
-if (import.meta.env.VITE_APP_ENV === "production") {
-  console.log(" Running in PRODUCTION mode");
-} else {
-  console.log(" Running in DEVELOPMENT mode");
-}
 
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    window.dashboard = new DevOpsDashboard();
-});
+
+
+
+
