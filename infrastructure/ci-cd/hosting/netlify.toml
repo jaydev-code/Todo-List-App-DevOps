@@ -3,3 +3,7 @@ base = "/"
 publish = "app-artifact"
 command = ""
 
+[dev]
+  command = "serve app-artifact"   # serve your static files properly
+  port = 8888
+  framework = "#static"
